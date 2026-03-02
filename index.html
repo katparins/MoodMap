@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Add Leaflet for Real Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Short+Stack&display=swap');
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Short Stack', cursive;
+            background-color: #fcfaf7;
+            color: #4a443f;
+            overflow: hidden;
+        }
+
+        .map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            background: #fdfaf5;
+            cursor: crosshair;
+        }
+
+        /* Leaflet Pastel Adjustments */
+        .leaflet-tile {
+            /* Boosts CartoDB Positron's subtle blues (water) and greens (parks) while keeping roads gray/white */
+            filter: saturate(2.5) contrast(1.05) brightness(1.02);
+            opacity: 0.95;
+        }
+        
+        .leaflet-container {
+            background: #fdfaf5 !important;
+            font-family: 'Short Stack', cursive;
+        }
+
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+            margin-right: 20px !important;
+            margin-bottom: 30px !important;
+        }
+
+        .leaflet-control-zoom a {
+            color: #4a443f !important;
+            background-color: rgba(253, 250, 245, 0.9) !important;
+            backdrop-filter: blur(4px);
+            border-color: #e5dfd3 !important;
+        }
+
+        /* Community Gradient Clouds */
+        .custom-leaflet-cloud {
+            pointer-events: none !important; /* Ensure we can click through clouds to the map */
+            overflow: visible;
+        }
+
+        .mood-cloud {
+            position: absolute;
+            width: var(--cloud-size, 54px);
+            height: var(--cloud-size, 54px);
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            /* Creates a soft radial gradient that fades perfectly to transparent */
+            background: radial-gradient(circle, currentColor 0%, rgba(255,255,255,0) 65%);
+            opacity: 0.45;
+            /* Multiply blend mode forces overlapping colors to mix (e.g. Yellow + Cyan = Greenish) */
+            mix-blend-mode: multiply;
+            animation: cloudFadeIn 1.5s ease-out forwards;
+        }
+
+        .mood-cloud.new-entry {
+            opacity: 0.7;
+            animation: cloudDropIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 999;
+        }
+
+        @keyframes cloudDropIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            60% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+        }
+
+        @keyframes cloudFadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 0.45; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Pulsating Emotion Dot Animation */
+        @keyframes dotPulse {
+            0% { box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 currentColor; }
+            70% { box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 8px transparent; }
+            100% { box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 transparent; }
+        }
+
+        .pulsate-effect {
+            animation: dotPulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        /* Emotion Wheel Overlay */
+        #wheel-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        #wheel-overlay.active {
+            pointer-events: auto;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 65px, rgba(252, 250, 247, 0.5) 220px);
+            backdrop-filter: blur(3px);
+            transition: backdrop-filter 0.3s ease;
+        }
+
+        .emotion-wheel {
+            position: absolute;
+            width: 0;
+            height: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0) rotate(-45deg);
+            opacity: 0;
+        }
+
+        .emotion-wheel.open {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+
+        .wheel-center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4a443f;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.7);
+        }
+
+        .wheel-petal {
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            transition: all 0.2s;
+            transform-origin: center;
+            margin-left: -26px;
+            margin-top: -26px;
+        }
+
+        .wheel-petal:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .wheel-petal span {
+            position: absolute;
+            bottom: -24px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4a443f;
+            background: rgba(255,255,255,0.9);
+            padding: 3px 8px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(-5px);
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .wheel-petal:hover span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Popup */
+        .custom-popup .leaflet-popup-content-wrapper {
+            font-family: 'Short Stack', cursive;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+            color: #4a443f !important;
+            padding: 4px !important;
+        }
+        
+        .custom-popup .leaflet-popup-tip {
+            background: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        .custom-popup .leaflet-popup-content {
+            margin: 12px 16px !important;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        /* Floating UI Elements */
+        .overlay-ui {
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .overlay-ui > * {
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Map Container -->
+    <div class="map-container" id="map"></div>
+
+    <!-- Emotion Wheel -->
+    <div id="wheel-overlay">
+        <div class="emotion-wheel" id="emotion-wheel">
+            <div class="wheel-center"></div>
+            <!-- Petals generated via JS -->
+        </div>
+    </div>
+
+    <!-- Floating Header -->
+    <header class="overlay-ui top-6 left-6 right-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100">
+            <h1 class="text-2xl font-light tracking-tight text-stone-800">MoodMap</span></h1>
+            <p class="text-stone-500 text-xs mt-1">A collective emotional gradient of the city</p>
+        </div>
+        
+        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex gap-8 items-center">
+            <div class="text-center">
+                <span class="block text-2xl font-light text-stone-800" id="total-entries">0</span>
+                <span class="text-stone-400 uppercase text-[9px] tracking-widest font-bold">Active Pulses</span>
+            </div>
+            <div class="h-8 w-px bg-stone-200"></div>
+            <div class="text-center">
+                <span class="block text-xl font-medium text-stone-800 flex items-center justify-center gap-2" id="dominant-mood">
+                    <span id="dom-emoji">--</span>
+                </span>
+                <span class="text-stone-400 uppercase text-[9px] tracking-widest font-bold mt-1">Dominant</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Legend -->
+    <div class="overlay-ui bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
+        <span class="text-[10px] uppercase tracking-widest font-bold text-stone-400">Heatmap Gradient</span>
+        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#F4C430] shadow-[0_0_5px_#F4C430]"></span> Happy</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#4A6FA5] shadow-[0_0_5px_#4A6FA5]"></span> Sad</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#C0392B] shadow-[0_0_5px_#C0392B]"></span> Angry</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#3b2a73] shadow-[0_0_5px_#3b2a73]"></span> Scared</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#E75480] shadow-[0_0_5px_#E75480]"></span> Loving</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#2A9D8F] shadow-[0_0_5px_#2A9D8F]"></span> Anxious</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#9ad498] shadow-[0_0_5px_#9ad498]"></span> Calm</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#F77F00] shadow-[0_0_5px_#F77F00]"></span> Excited</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#D98C8C] shadow-[0_0_5px_#D98C8C]"></span> Embarrassed</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#9A8C98] shadow-[0_0_5px_#9A8C98]"></span> Tired</span>
+        </div>
+    </div>
+
+    <!-- Locate Me Text Button -->
+    <div id="locate-btn-container" class="overlay-ui bottom-[140px] left-1/2 transform -translate-x-1/2 z-[1000] transition-opacity duration-300">
+        <button id="locate-btn" class="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 text-stone-600 hover:text-stone-900 hover:bg-white hover:scale-105 transition-all font-bold tracking-wide flex items-center gap-2" title="Locate Me">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <span id="locate-text">Locate Me</span>
+        </button>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="note-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/20 backdrop-blur-sm">
+        <div class="bg-white/95 p-6 rounded-3xl shadow-xl border border-stone-100 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="note-modal-content">
+            <h3 class="text-2xl font-bold mb-2"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span> <span class="text-stone-400 text-base font-normal">(optional)</span></h3>
+            <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['Short_Stack'] text-stone-700 placeholder-stone-400">
+            <div class="flex justify-between items-center mt-4">
+                <span class="text-lg text-stone-400"><span id="char-count">0</span>/50</span>
+                <div class="flex gap-2 text-lg">
+                    <button id="cancel-note" class="px-4 py-2 rounded-xl text-stone-500 hover:bg-stone-100 transition-colors">Skip</button>
+                    <button id="submit-note" class="px-4 py-2 rounded-xl bg-stone-800 text-white hover:opacity-80 transition-opacity shadow-md">Drop Pin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emotions = [
+            { id: 'happy', emoji: '🌼', color: '#F4C430', label: 'Happy' },
+            { id: 'sad', emoji: '🌧', color: '#4A6FA5', label: 'Sad' },
+            { id: 'angry', emoji: '🔥', color: '#C0392B', label: 'Angry' },
+            { id: 'scared', emoji: '😨', color: '#3b2a73', label: 'Scared' },
+            { id: 'loving', emoji: '💗', color: '#E75480', label: 'Loving' },
+            { id: 'anxious', emoji: '🌪', color: '#2A9D8F', label: 'Anxious' },
+            { id: 'calm', emoji: '🍃', color: '#9ad498', label: 'Calm' },
+            { id: 'excited', emoji: '⚡️', color: '#F77F00', label: 'Excited' },
+            { id: 'embarrassed', emoji: '😳', color: '#D98C8C', label: 'Embarrassed' },
+            { id: 'tired', emoji: '💤', color: '#9A8C98', label: 'Tired' }
+        ];
+
+        let entries = [];
+        let pendingLatLng = null;
+        let selectedEmotionForNote = null;
+        let userLocation = null;
+
+        // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
+        const map = L.map('map', {
+            center: [40.7300, -73.9900], // New York City (Lower Manhattan focused)
+            zoom: 13, // City scale
+            minZoom: 11,
+            zoomControl: false 
+        });
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Add CartoDB Positron 
+        // This provider uses white/gray for all roads.
+        // Combined with our CSS filters, the subtle water/parks become vibrant pastels.
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Set up Emotion Wheel
+        const wheelOverlay = document.getElementById('wheel-overlay');
+        const emotionWheel = document.getElementById('emotion-wheel');
+        const radius = 95; // Increased distance to comfortably fit 10 buttons
+
+        emotions.forEach((emo, index) => {
+            const angle = (index / emotions.length) * 2 * Math.PI - (Math.PI / 2); // Start at top
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            const petal = document.createElement('div');
+            petal.className = 'wheel-petal';
+            petal.style.left = `${x}px`;
+            petal.style.top = `${y}px`;
+            petal.style.backgroundColor = emo.color + '15'; // Very light tint
+            petal.style.borderColor = emo.color;
+            petal.innerHTML = `${emo.emoji} <span>${emo.label}</span>`;
+            
+            petal.onclick = (e) => {
+                e.stopPropagation();
+                if (pendingLatLng) {
+                    selectedEmotionForNote = emo;
+                    wheelOverlay.classList.remove('active');
+                    emotionWheel.classList.remove('open');
+                    openNoteModal();
+                }
+            };
+
+            emotionWheel.appendChild(petal);
+        });
+
+        function openWheelAt(lat, lng) {
+            pendingLatLng = L.latLng(lat, lng);
+            const containerPoint = map.latLngToContainerPoint(pendingLatLng);
+            
+            wheelOverlay.classList.add('active');
+            wheelOverlay.style.setProperty('--mouse-x', `${containerPoint.x}px`);
+            wheelOverlay.style.setProperty('--mouse-y', `${containerPoint.y}px`);
+            
+            emotionWheel.style.left = `${containerPoint.x}px`;
+            emotionWheel.style.top = `${containerPoint.y}px`;
+            emotionWheel.classList.add('open');
+        }
+
+        // Map Interaction
+        map.on('click', (e) => {
+            openWheelAt(e.latlng.lat, e.latlng.lng);
+        });
+
+        wheelOverlay.addEventListener('click', closeWheel);
+        map.on('dragstart', closeWheel);
+        map.on('zoomstart', closeWheel);
+
+        function closeWheel() {
+            wheelOverlay.classList.remove('active');
+            emotionWheel.classList.remove('open');
+            // Only clear pendingLatLng if the modal isn't opening
+            if (document.getElementById('note-modal').classList.contains('hidden')) {
+                pendingLatLng = null;
+            }
+        }
+
+        function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "") {
+            // Store the coordinates with the emotion so we can check if it's on screen later
+            entries.push({ id: emotion.id, lat: lat, lng: lng });
+
+            const customIcon = L.divIcon({
+                className: 'custom-leaflet-cloud',
+                html: `<div class="mood-cloud ${isUserEntry ? 'new-entry' : ''}" style="color: ${emotion.color};"></div>`,
+                iconSize: [0, 0], // CSS now handles dynamic sizing based on zoom
+                iconAnchor: [0, 0] // Center precisely on the coordinates
+            });
+
+            L.marker([lat, lng], {icon: customIcon, interactive: false}).addTo(map);
+
+            // Add a tiny interactive pulsating dot to click and see the emotion & note
+            // Notice: color is set inline so that `currentColor` in CSS animation matches the emotion
+            const dotIcon = L.divIcon({
+                className: 'custom-leaflet-note',
+                html: `<div class="w-4 h-4 rounded-full border-[2px] border-white cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            const dotMarker = L.marker([lat, lng], {icon: dotIcon, interactive: true}).addTo(map);
+            
+            // Build the popup content
+            let popupHtml = `<div class="flex flex-col items-center justify-center">
+                <span class="text-2xl mb-1">${emotion.emoji}</span>
+                <span class="font-bold text-sm tracking-wide uppercase" style="color: ${emotion.color};">${emotion.label}</span>`;
+            
+            // Append note text if it exists
+            if (note) {
+                popupHtml += `<div class="mt-2 text-[1.1rem] text-stone-600 border-t border-stone-200 pt-2 break-words max-w-[200px] whitespace-normal leading-tight">${note}</div>`;
+            }
+            
+            popupHtml += `</div>`;
+
+            // Bind it as a click popup instead of a hover tooltip
+            dotMarker.bindPopup(popupHtml, { 
+                offset: [0, -4], 
+                className: 'custom-popup',
+                closeButton: false,
+                minWidth: 80
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            // Get the current visible boundaries of the map
+            const bounds = map.getBounds();
+            
+            // Filter entries to only include those currently visible on screen
+            const visibleEntries = entries.filter(entry => bounds.contains([entry.lat, entry.lng]));
+
+            document.getElementById('total-entries').innerText = visibleEntries.length;
+            
+            if (visibleEntries.length > 0) {
+                const counts = visibleEntries.reduce((acc, curr) => {
+                    acc[curr.id] = (acc[curr.id] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const dominantId = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+                const domEmotion = emotions.find(e => e.id === dominantId);
+                
+                document.getElementById('dominant-mood').innerHTML = `${domEmotion.emoji} <span class="text-sm font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
+            } else {
+                document.getElementById('dominant-mood').innerHTML = `<span id="dom-emoji">--</span>`;
+            }
+        }
+
+        // Hide Locate button when user is zoomed in near their physical location
+        function toggleLocateButton() {
+            if (!userLocation) return;
+            const center = map.getCenter();
+            const dist = center.distanceTo([userLocation.lat, userLocation.lng]);
+            const zoom = map.getZoom();
+            const locateContainer = document.getElementById('locate-btn-container');
+            
+            // Distance in meters (< 200m) and Zoom level 15+ means they are looking at their area
+            if (dist < 200 && zoom >= 15) {
+                locateContainer.classList.add('opacity-0', 'pointer-events-none');
+            } else {
+                locateContainer.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // Keeps the geographic area of the clouds consistent regardless of zoom
+        function updateCloudSize() {
+            // Base size decreased by 70% (was 180px, now 54px) at default zoom level 13
+            const baseSize = 54; 
+            const baseZoom = 13;
+            const currentZoom = map.getZoom();
+            
+            // Calculates the factor to shrink/grow based on zoom difference
+            const zoomDiff = currentZoom - baseZoom;
+            const newSize = baseSize * Math.pow(2, zoomDiff);
+            
+            document.documentElement.style.setProperty('--cloud-size', `${newSize}px`);
+        }
+
+        // Attach resize logic to map zoom event
+        map.on('zoom', updateCloudSize);
+        
+        // Recalculate stats whenever the user moves or zooms the map
+        map.on('moveend', () => {
+            updateStats();
+            toggleLocateButton();
+        });
+        
+        map.on('zoomend', toggleLocateButton);
+        
+        // Set initial cloud size
+        updateCloudSize();
+
+        // --- Note Modal Logic ---
+        const noteModal = document.getElementById('note-modal');
+        const noteModalContent = document.getElementById('note-modal-content');
+        const noteInput = document.getElementById('note-input');
+        const charCount = document.getElementById('char-count');
+        
+        function openNoteModal() {
+            noteModal.classList.remove('hidden');
+            setTimeout(() => {
+                noteModalContent.classList.remove('scale-95', 'opacity-0');
+                noteModalContent.classList.add('scale-100', 'opacity-100');
+                noteInput.focus();
+                
+                // Colorize the input border, title, and button to match the selected emotion
+                if(selectedEmotionForNote) {
+                    noteInput.style.borderColor = selectedEmotionForNote.color;
+                    document.getElementById('note-title-text').style.color = selectedEmotionForNote.color;
+                    document.getElementById('submit-note').style.backgroundColor = selectedEmotionForNote.color;
+                }
+            }, 10);
+        }
+
+        function closeNoteModal() {
+            noteModalContent.classList.remove('scale-100', 'opacity-100');
+            noteModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                noteModal.classList.add('hidden');
+                noteInput.value = '';
+                noteInput.style.borderColor = '';
+                charCount.innerText = '0';
+                
+                // Reset dynamic colors
+                document.getElementById('note-title-text').style.color = '';
+                document.getElementById('submit-note').style.backgroundColor = '';
+
+                selectedEmotionForNote = null;
+                pendingLatLng = null; // Clear coordinate lock
+            }, 300);
+        }
+
+        noteInput.addEventListener('input', (e) => {
+            charCount.innerText = e.target.value.length;
+        });
+
+        document.getElementById('cancel-note').addEventListener('click', () => {
+            if (pendingLatLng && selectedEmotionForNote) {
+                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, "");
+            }
+            closeNoteModal();
+        });
+
+        document.getElementById('submit-note').addEventListener('click', () => {
+            if (pendingLatLng && selectedEmotionForNote) {
+                const noteText = noteInput.value.trim();
+                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, noteText);
+            }
+            closeNoteModal();
+        });
+
+        noteInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-note').click();
+            }
+        });
+
+        // --- Locate Me Logic ---
+        document.getElementById('locate-btn').addEventListener('click', () => {
+            const btn = document.getElementById('locate-btn');
+            const btnText = document.getElementById('locate-text');
+            btnText.innerText = 'Locating...';
+            btn.classList.add('animate-pulse', 'text-stone-400');
+            
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    userLocation = { lat, lng };
+                    
+                    btnText.innerText = 'Locate Me';
+                    btn.classList.remove('animate-pulse', 'text-stone-400');
+                    
+                    const targetZoom = 16;
+                    const currentZoom = map.getZoom();
+                    const currentCenter = map.getCenter();
+                    const dist = currentCenter.distanceTo([lat, lng]);
+
+                    if (dist < 10 && currentZoom === targetZoom) {
+                        openWheelAt(lat, lng);
+                        toggleLocateButton(); // Checks if it should be hidden
+                    } else {
+                        map.once('moveend', () => {
+                            openWheelAt(lat, lng);
+                            toggleLocateButton(); // Checks if it should be hidden
+                        });
+                        map.flyTo([lat, lng], targetZoom, { animate: true, duration: 1.5 });
+                    }
+                }, (error) => {
+                    console.error("Location error:", error);
+                    btnText.innerText = 'Error';
+                    btn.classList.remove('animate-pulse', 'text-stone-400');
+                    btn.classList.add('text-red-500');
+                    setTimeout(() => {
+                        btn.classList.remove('text-red-500');
+                        btnText.innerText = 'Locate Me';
+                    }, 2000);
+                });
+            } else {
+                btnText.innerText = 'Error';
+                btn.classList.remove('animate-pulse', 'text-stone-400');
+                btn.classList.add('text-red-500');
+                setTimeout(() => {
+                    btn.classList.remove('text-red-500');
+                    btnText.innerText = 'Locate Me';
+                }, 2000);
+            }
+        });
+
+    </script>
+</body>
+</html>
