@@ -231,6 +231,22 @@
         .overlay-ui > * {
             pointer-events: auto;
         }
+
+        /* Legend Filter Styles */
+        .legend-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .legend-item.dimmed {
+            opacity: 0.3;
+            filter: grayscale(0.8);
+        }
+        .legend-item:hover:not(.dimmed) {
+            transform: scale(1.05);
+        }
+        .legend-item.dimmed:hover {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -249,7 +265,7 @@
     <!-- Floating Header -->
     <header class="overlay-ui top-6 left-6 right-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100">
-            <h1 class="text-2xl font-light tracking-tight text-stone-800">MoodMap</span></h1>
+            <h1 class="text-2xl font-light tracking-tight text-stone-800">MoodMap</h1>
             <p class="text-stone-500 text-xs mt-1">A collective emotional gradient of the city</p>
         </div>
         
@@ -270,18 +286,12 @@
 
     <!-- Floating Legend -->
     <div class="overlay-ui bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
-        <span class="text-[10px] uppercase tracking-widest font-bold text-stone-400">Heatmap Gradient</span>
-        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#F4C430] shadow-[0_0_5px_#F4C430]"></span> Happy</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#4A6FA5] shadow-[0_0_5px_#4A6FA5]"></span> Sad</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#C0392B] shadow-[0_0_5px_#C0392B]"></span> Angry</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#3b2a73] shadow-[0_0_5px_#3b2a73]"></span> Scared</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#E75480] shadow-[0_0_5px_#E75480]"></span> Loving</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#2A9D8F] shadow-[0_0_5px_#2A9D8F]"></span> Anxious</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#9ad498] shadow-[0_0_5px_#9ad498]"></span> Calm</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#F77F00] shadow-[0_0_5px_#F77F00]"></span> Excited</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#D98C8C] shadow-[0_0_5px_#D98C8C]"></span> Embarrassed</span>
-            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#9A8C98] shadow-[0_0_5px_#9A8C98]"></span> Tired</span>
+        <div class="flex items-center gap-3">
+            <span class="text-[10px] uppercase tracking-widest font-bold text-stone-400">Filter by Mood</span>
+            <button id="clear-filter" class="hidden text-[9px] uppercase tracking-widest font-bold text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
+        </div>
+        <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
+            <!-- Dynamically generated legend items -->
         </div>
     </div>
 
@@ -326,6 +336,7 @@
         let pendingLatLng = null;
         let selectedEmotionForNote = null;
         let userLocation = null;
+        let activeFilters = []; // Updated to support multiple filters
 
         // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
         const map = L.map('map', {
@@ -409,8 +420,12 @@
         }
 
         function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "") {
-            // Store the coordinates with the emotion so we can check if it's on screen later
-            entries.push({ id: emotion.id, lat: lat, lng: lng });
+            // Auto-clear filters if user drops a new pin that doesn't match current active filters
+            if (isUserEntry && activeFilters.length > 0 && !activeFilters.includes(emotion.id)) {
+                activeFilters = [];
+                applyFilter();
+                renderLegend();
+            }
 
             const customIcon = L.divIcon({
                 className: 'custom-leaflet-cloud',
@@ -419,7 +434,7 @@
                 iconAnchor: [0, 0] // Center precisely on the coordinates
             });
 
-            L.marker([lat, lng], {icon: customIcon, interactive: false}).addTo(map);
+            const cloudMarker = L.marker([lat, lng], {icon: customIcon, interactive: false});
 
             // Add a tiny interactive pulsating dot to click and see the emotion & note
             // Notice: color is set inline so that `currentColor` in CSS animation matches the emotion
@@ -430,8 +445,18 @@
                 iconAnchor: [8, 8]
             });
             
-            const dotMarker = L.marker([lat, lng], {icon: dotIcon, interactive: true}).addTo(map);
+            const dotMarker = L.marker([lat, lng], {icon: dotIcon, interactive: true});
             
+            // Only add to map if it matches current filter criteria
+            const shouldShow = activeFilters.length === 0 || activeFilters.includes(emotion.id);
+            if (shouldShow) {
+                cloudMarker.addTo(map);
+                dotMarker.addTo(map);
+            }
+
+            // Store the coordinates and markers so we can check if it's on screen and toggle visibility later
+            entries.push({ id: emotion.id, lat: lat, lng: lng, cloudMarker, dotMarker });
+
             // Build the popup content
             let popupHtml = `<div class="flex flex-col items-center justify-center">
                 <span class="text-2xl mb-1">${emotion.emoji}</span>
@@ -459,8 +484,11 @@
             // Get the current visible boundaries of the map
             const bounds = map.getBounds();
             
-            // Filter entries to only include those currently visible on screen
-            const visibleEntries = entries.filter(entry => bounds.contains([entry.lat, entry.lng]));
+            // Filter entries to only include those currently visible on screen AND matching the active filter
+            const visibleEntries = entries.filter(entry => 
+                bounds.contains([entry.lat, entry.lng]) &&
+                (activeFilters.length === 0 || activeFilters.includes(entry.id))
+            );
 
             document.getElementById('total-entries').innerText = visibleEntries.length;
             
@@ -522,6 +550,67 @@
         
         // Set initial cloud size
         updateCloudSize();
+
+        // --- Filter Logic ---
+        const legendContainer = document.getElementById('legend-container');
+        const clearFilterBtn = document.getElementById('clear-filter');
+
+        function renderLegend() {
+            legendContainer.innerHTML = '';
+            
+            if (activeFilters.length > 0) {
+                clearFilterBtn.classList.remove('hidden');
+            } else {
+                clearFilterBtn.classList.add('hidden');
+            }
+
+            emotions.forEach(emo => {
+                const item = document.createElement('span');
+                const isActive = activeFilters.includes(emo.id);
+                // Dim item if there are active filters, but THIS item is not one of them
+                const isDimmed = activeFilters.length > 0 && !isActive; 
+                
+                item.className = `legend-item flex items-center gap-1.5 px-2 py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 shadow-inner' : ''}`;
+                item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${emo.color}; box-shadow: 0 0 5px ${emo.color}"></span> ${emo.label}`;
+                item.onclick = () => toggleFilter(emo.id);
+                legendContainer.appendChild(item);
+            });
+        }
+
+        function toggleFilter(emoId) {
+            if (activeFilters.includes(emoId)) {
+                // If already active, toggle it off by removing it from the array
+                activeFilters = activeFilters.filter(id => id !== emoId);
+            } else {
+                // If not active, add it to the array
+                activeFilters.push(emoId);
+            }
+            applyFilter();
+            renderLegend();
+        }
+
+        clearFilterBtn.addEventListener('click', () => {
+            activeFilters = []; // Reset array
+            applyFilter();
+            renderLegend();
+        });
+
+        function applyFilter() {
+            entries.forEach(entry => {
+                const shouldShow = activeFilters.length === 0 || activeFilters.includes(entry.id);
+                if (shouldShow) {
+                    if (!map.hasLayer(entry.cloudMarker)) map.addLayer(entry.cloudMarker);
+                    if (!map.hasLayer(entry.dotMarker)) map.addLayer(entry.dotMarker);
+                } else {
+                    if (map.hasLayer(entry.cloudMarker)) map.removeLayer(entry.cloudMarker);
+                    if (map.hasLayer(entry.dotMarker)) map.removeLayer(entry.dotMarker);
+                }
+            });
+            updateStats();
+        }
+
+        // Initialize Legend
+        renderLegend();
 
         // --- Note Modal Logic ---
         const noteModal = document.getElementById('note-modal');
