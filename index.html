@@ -134,7 +134,7 @@
 
         #wheel-overlay.active {
             pointer-events: auto;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 65px, rgba(252, 250, 247, 0.5) 220px);
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 65px, rgba(252, 250, 247, 0.5) 240px);
             backdrop-filter: blur(3px);
             transition: backdrop-filter 0.3s ease;
         }
@@ -143,13 +143,13 @@
             position: absolute;
             width: 0;
             height: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: scale(0) rotate(-45deg);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            transform: scale(0) rotate(-45deg) translateZ(0);
             opacity: 0;
         }
 
         .emotion-wheel.open {
-            transform: scale(1) rotate(0deg);
+            transform: scale(1) rotate(0deg) translateZ(0);
             opacity: 1;
         }
 
@@ -165,33 +165,34 @@
 
         .wheel-petal {
             position: absolute;
-            width: 72px; /* Perfect size to not overlap */
-            height: 72px;
+            /* Shrunk the transparent hitbox strictly to the core of the icon to prevent overlapping */
+            width: 60px; 
+            height: 60px;
             border-radius: 50%;
-            background: white;
-            border: 2px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: transparent; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
             transform-origin: center;
-            margin-left: -36px;
-            margin-top: -36px;
+            margin-left: -30px; 
+            margin-top: -30px;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         .wheel-petal:hover {
-            transform: scale(1.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: scale(1.25) translateZ(0);
             z-index: 10;
         }
 
         .wheel-petal span {
             position: absolute;
-            bottom: -28px;
-            font-size: 10px;
+            /* Adjusted position further down to accommodate the overflowing images */
+            bottom: -40px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -200,8 +201,8 @@
             padding: 3px 8px;
             border-radius: 6px;
             opacity: 0;
-            transition: opacity 0.2s, transform 0.2s;
-            transform: translateY(-5px);
+            transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+            transform: translateY(-5px) translateZ(0);
             pointer-events: none;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 20;
@@ -209,7 +210,7 @@
 
         .wheel-petal:hover span {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) translateZ(0);
         }
 
         /* Custom Popup */
@@ -364,16 +365,16 @@
 
     <script>
         const emotions = [
-            { id: 'happy', image: 'happy.png', color: '#F4C430', label: 'Happy', scale: 'scale-[1.6]' },
-            { id: 'sad', image: 'sad.png', color: '#4A6FA5', label: 'Sad', scale: 'scale-[1.8]' },
-            { id: 'angry', image: 'angry.png', color: '#C0392B', label: 'Angry', scale: 'scale-[1.4]' },
-            { id: 'annoyed', image: 'annoyed.png', color: '#3b2a73', label: 'Annoyed', scale: 'scale-[1.05]' },
-            { id: 'loving', image: 'loving.png', color: '#E75480', label: 'Loving', scale: 'scale-[1.4]' },
+            { id: 'happy', image: 'happy.png', color: '#F4C430', label: 'Happy', scale: 'scale-[1.4]' },
+            { id: 'sad', image: 'sad.png', color: '#07addb', label: 'Sad', scale: 'scale-[1.6]' },
+            { id: 'angry', image: 'angry.png', color: '#C0392B', label: 'Angry', scale: 'scale-[1.3]' },
+            { id: 'annoyed', image: 'annoyed.png', color: '#8567C4', label: 'Annoyed', scale: 'scale-[0.95]' },
+            { id: 'loving', image: 'loving.png', color: '#e35497', label: 'Loving', scale: 'scale-[1.3]' },
             { id: 'anxious', image: 'anxious.png', color: '#2A9D8F', label: 'Anxious', scale: 'scale-[1.2]' },
             { id: 'calm', image: 'calm.png', color: '#9ad498', label: 'Calm', scale: 'scale-[1.1]' },
-            { id: 'excited', image: 'excited.png', color: '#F77F00', label: 'Excited', scale: 'scale-[1.6]' },
-            { id: 'embarrassed', image: 'embarrassed.png', color: '#D98C8C', label: 'Embarrassed', scale: 'scale-[1.6]' },
-            { id: 'tired', image: 'tired.png', color: '#9A8C98', label: 'Tired', scale: 'scale-[1.1]' }
+            { id: 'excited', image: 'excited.png', color: '#F77F00', label: 'Excited', scale: 'scale-[1.4]' },
+            { id: 'embarrassed', image: 'embarrassed.png', color: '#D98C8C', label: 'Embarrassed', scale: 'scale-[1.4]' },
+            { id: 'tired', image: 'tired.png', color: '#9A8C98', label: 'Tired', scale: 'scale-[0.95]' }
         ];
 
         let entries = [];
@@ -426,7 +427,7 @@
         // Set up Emotion Wheel
         const wheelOverlay = document.getElementById('wheel-overlay');
         const emotionWheel = document.getElementById('emotion-wheel');
-        const radius = 135; // Kept at 135 so 72px bubbles comfortably fit around
+        const radius = 105; // Tighter cluster radius
 
         emotions.forEach((emo, index) => {
             const angle = (index / emotions.length) * 2 * Math.PI - (Math.PI / 2); // Start at top
@@ -437,10 +438,10 @@
             petal.className = 'wheel-petal';
             petal.style.left = `${x}px`;
             petal.style.top = `${y}px`;
-            petal.style.backgroundColor = emo.color + '15'; // Very light tint
-            petal.style.borderColor = emo.color;
-            // Apply unique scaling per emotion
-            petal.innerHTML = `<img src="${emo.image}" alt="${emo.label}" class="w-full h-full pointer-events-none object-contain drop-shadow-md ${emo.scale}"> <span>${emo.label}</span>`;
+            
+            // The image is absolute so it can freely overflow the strictly-sized 60x60 hitbox.
+            // The 85px size + scaling logic lets the visual remain huge while the mouse detection stays isolated.
+            petal.innerHTML = `<img src="${emo.image}" alt="${emo.label}" draggable="false" class="absolute w-[85px] h-[85px] max-w-none pointer-events-none object-contain drop-shadow-md ${emo.scale} transform-gpu"> <span>${emo.label}</span>`;
             
             petal.onclick = (e) => {
                 e.stopPropagation();
@@ -480,7 +481,7 @@
         function closeWheel() {
             wheelOverlay.classList.remove('active');
             emotionWheel.classList.remove('open');
-            // Only clear pendingLatLng if the modal isn't opening
+            // Only clear pendingLatLng if the modal isnt opening
             if (document.getElementById('note-modal').classList.contains('hidden')) {
                 pendingLatLng = null;
             }
@@ -515,7 +516,7 @@
             
             // Build the popup content
             let popupHtml = `<div class="flex flex-col items-center justify-center">
-                <div class="w-12 h-12 flex items-center justify-center mb-1"><img src="${emotion.image}" alt="${emotion.label}" class="w-full h-full object-contain drop-shadow-md ${emotion.scale}"></div>
+                <div class="w-14 h-14 flex items-center justify-center mb-1"><img src="${emotion.image}" alt="${emotion.label}" class="w-full h-full object-contain drop-shadow-md ${emotion.scale}"></div>
                 <span class="font-bold text-sm tracking-wide uppercase" style="color: ${emotion.color};">${emotion.label}</span>`;
             
             // Append note text if it exists
@@ -571,7 +572,7 @@
                 });
                 
                 const domEmotion = rankedEmotions[0];
-                dominantMoodContentEl.innerHTML = `<div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}"></div> <span class="text-sm font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
+                dominantMoodContentEl.innerHTML = `<div class="w-10 h-10 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}"></div> <span class="text-sm font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
                 
                 // Populate the Expandable Ranked List
                 rankedListContent.innerHTML = '';
@@ -584,7 +585,7 @@
                         <div class="flex items-center justify-between p-2 rounded-xl hover:bg-stone-50 transition-colors ${opacityClass}">
                             <div class="flex items-center gap-2.5">
                                 <span class="text-[10px] font-bold text-stone-300 w-3 text-right">${rankNum}</span>
-                                <div class="w-6 h-6 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div>
+                                <div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div>
                                 <span class="font-semibold text-sm tracking-wide" style="color: ${emo.color}">${emo.label}</span>
                             </div>
                             <span class="text-xs font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">${count}</span>
