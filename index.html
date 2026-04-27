@@ -366,14 +366,14 @@
         const emotions = [
             { id: 'happy', image: 'happy.png', color: '#F4C430', label: 'Happy', scale: 'scale-[1.6]' },
             { id: 'sad', image: 'sad.png', color: '#4A6FA5', label: 'Sad', scale: 'scale-[1.8]' },
-            { id: 'angry', image: 'angry.png', color: '#C0392B', label: 'Angry', scale: 'scale-[1.6]' },
+            { id: 'angry', image: 'angry.png', color: '#C0392B', label: 'Angry', scale: 'scale-[1.4]' },
             { id: 'annoyed', image: 'annoyed.png', color: '#3b2a73', label: 'Annoyed', scale: 'scale-[1.05]' },
             { id: 'loving', image: 'loving.png', color: '#E75480', label: 'Loving', scale: 'scale-[1.4]' },
-            { id: 'anxious', image: 'anxious.png', color: '#2A9D8F', label: 'Anxious', scale: 'scale-[1.4]' },
+            { id: 'anxious', image: 'anxious.png', color: '#2A9D8F', label: 'Anxious', scale: 'scale-[1.2]' },
             { id: 'calm', image: 'calm.png', color: '#9ad498', label: 'Calm', scale: 'scale-[1.1]' },
             { id: 'excited', image: 'excited.png', color: '#F77F00', label: 'Excited', scale: 'scale-[1.6]' },
             { id: 'embarrassed', image: 'embarrassed.png', color: '#D98C8C', label: 'Embarrassed', scale: 'scale-[1.6]' },
-            { id: 'tired', image: 'tired.png', color: '#9A8C98', label: 'Tired', scale: 'scale-[1.6]' }
+            { id: 'tired', image: 'tired.png', color: '#9A8C98', label: 'Tired', scale: 'scale-[1.1]' }
         ];
 
         let entries = [];
@@ -513,16 +513,6 @@
             
             const dotMarker = L.marker([lat, lng], {icon: dotIcon, interactive: true});
             
-            // Only add to map if it matches current filter criteria
-            const shouldShow = activeFilters.length === 0 || activeFilters.includes(emotion.id);
-            if (shouldShow) {
-                cloudMarker.addTo(map);
-                dotMarker.addTo(map);
-            }
-
-            // Store the coordinates and markers so we can check if it's on screen and toggle visibility later
-            entries.push({ id: emotion.id, lat: lat, lng: lng, cloudMarker, dotMarker });
-
             // Build the popup content
             let popupHtml = `<div class="flex flex-col items-center justify-center">
                 <div class="w-12 h-12 flex items-center justify-center mb-1"><img src="${emotion.image}" alt="${emotion.label}" class="w-full h-full object-contain drop-shadow-md ${emotion.scale}"></div>
@@ -734,12 +724,6 @@
                 const shouldShow = activeFilters.length === 0 || activeFilters.includes(entry.id);
                 if (shouldShow) {
                     if (!map.hasLayer(entry.cloudMarker)) map.addLayer(entry.cloudMarker);
-<<<<<<< HEAD
-                    if (!map.hasLayer(entry.dotMarker)) map.addLayer(entry.dotMarker);
-                } else {
-                    if (map.hasLayer(entry.cloudMarker)) map.removeLayer(entry.cloudMarker);
-                    if (map.hasLayer(entry.dotMarker)) map.removeLayer(entry.dotMarker);
-=======
                     if (!map.hasLayer(entry.dotMarker)) {
                         map.addLayer(entry.dotMarker);
                         oms.addMarker(entry.dotMarker); // Re-add to Spiderfier
@@ -750,7 +734,6 @@
                         map.removeLayer(entry.dotMarker);
                         oms.removeMarker(entry.dotMarker); // Remove from Spiderfier
                     }
->>>>>>> c8270c6 (feat: added emotion ranking and graphics)
                 }
             });
             updateStats();
