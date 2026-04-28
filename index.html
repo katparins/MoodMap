@@ -331,23 +331,28 @@
         </div>
     </header>
 
-    <!-- Floating Legend -->
-    <div class="overlay-ui bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
-        <div class="flex items-center gap-3">
-            <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400">Filter by Mood</span>
-            <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
+    <!-- Bottom UI Stack (Locate Me & Legend) -->
+    <div class="overlay-ui bottom-8 left-0 w-full flex flex-col items-center gap-4 z-[1000]">
+        
+        <!-- Locate Me Text Button -->
+        <div id="locate-btn-container" class="transition-opacity duration-300">
+            <button id="locate-btn" class="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 text-stone-600 hover:text-stone-900 hover:bg-white hover:scale-105 transition-all font-medium tracking-wide flex items-center gap-2" title="Locate Me">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                <span id="locate-text">Locate Me</span>
+            </button>
         </div>
-        <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
-            <!-- Dynamically generated legend items -->
-        </div>
-    </div>
 
-    <!-- Locate Me Text Button -->
-    <div id="locate-btn-container" class="overlay-ui bottom-[140px] left-1/2 transform -translate-x-1/2 z-[1000] transition-opacity duration-300">
-        <button id="locate-btn" class="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 text-stone-600 hover:text-stone-900 hover:bg-white hover:scale-105 transition-all font-medium tracking-wide flex items-center gap-2" title="Locate Me">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            <span id="locate-text">Locate Me</span>
-        </button>
+        <!-- Floating Legend -->
+        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
+            <div class="flex items-center gap-3">
+                <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400">Filter by Mood</span>
+                <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
+            </div>
+            <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
+                <!-- Dynamically generated legend items -->
+            </div>
+        </div>
+
     </div>
 
     <!-- Note Modal -->
@@ -359,7 +364,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
-            <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span> <span class="text-stone-400 text-base font-normal">(optional)</span></h3>
+            <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span></h3>
             <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['DynaPuff'] text-stone-700 placeholder-stone-400">
             <div class="flex justify-between items-center mt-4">
                 <span class="text-lg text-stone-400"><span id="char-count">0</span>/50</span>
