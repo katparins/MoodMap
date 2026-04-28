@@ -320,7 +320,7 @@
                 <!-- Expandable Ranked List -->
                 <div id="ranked-list-container" class="absolute top-[110%] right-0 mt-2 bg-white/95 backdrop-blur-xl border border-stone-100 shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-2xl w-56 overflow-hidden opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 z-[1001]">
                     <div class="p-3 bg-stone-50/80 border-b border-stone-100 flex justify-between items-center">
-                        <span class="text-[10px] font-medium uppercase tracking-widest text-stone-400">Emotion Ranking</span>
+                        <span class="text-[11px] font-medium uppercase tracking-widest text-stone-400">Emotion Ranking</span>
                     </div>
                     <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1 text-left">
                         <!-- Populated via JS -->
@@ -334,8 +334,8 @@
     <!-- Floating Legend -->
     <div class="overlay-ui bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
         <div class="flex items-center gap-3">
-            <span class="text-[10px] uppercase tracking-widest font-medium text-stone-400">Filter by Mood</span>
-            <button id="clear-filter" class="hidden text-[9px] uppercase tracking-widest font-medium text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
+            <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400">Filter by Mood</span>
+            <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
         </div>
         <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
             <!-- Dynamically generated legend items -->
@@ -352,8 +352,14 @@
 
     <!-- Note Modal -->
     <div id="note-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/20 backdrop-blur-sm">
-        <div class="bg-white/95 p-6 rounded-3xl shadow-xl border border-stone-100 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="note-modal-content">
-            <h3 class="text-2xl font-medium mb-2"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span> <span class="text-stone-400 text-base font-normal">(optional)</span></h3>
+        <div class="bg-white/95 p-6 rounded-3xl shadow-xl border border-stone-100 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0 relative" id="note-modal-content">
+            
+            <!-- X Close Button to Abort -->
+            <button id="close-modal-x" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none p-1 rounded-full hover:bg-stone-100" aria-label="Cancel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span> <span class="text-stone-400 text-base font-normal">(optional)</span></h3>
             <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['DynaPuff'] text-stone-700 placeholder-stone-400">
             <div class="flex justify-between items-center mt-4">
                 <span class="text-lg text-stone-400"><span id="char-count">0</span>/50</span>
@@ -789,6 +795,12 @@
             charCount.innerText = e.target.value.length;
         });
 
+        // Cancel (X) button closes modal completely without pinning
+        document.getElementById('close-modal-x').addEventListener('click', () => {
+            closeNoteModal();
+        });
+
+        // Skip button drops pin with empty note
         document.getElementById('cancel-note').addEventListener('click', () => {
             if (pendingLatLng && selectedEmotionForNote) {
                 addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, "");
