@@ -396,6 +396,13 @@
         let userLocation = null;
         let activeFilters = []; // Updated to support multiple filters
 
+        // Initialize Audio objects
+        const hoverSound = new Audio('hover.mp3');
+        hoverSound.preload = 'auto'; // Preload the audio to make it ready instantly
+
+        const clickSound = new Audio('click.mp3');
+        clickSound.preload = 'auto'; // Preload the click sound
+
         // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
         const map = L.map('map', {
             center: [40.7300, -73.9900], // New York City (Lower Manhattan focused)
@@ -465,6 +472,15 @@
                     openNoteModal();
                 }
             };
+            
+            // Add hover sound effect logic
+            petal.addEventListener('mouseenter', () => {
+                hoverSound.currentTime = 0; // reset sound so it can play rapidly
+                hoverSound.play().catch(e => {
+                    // Browser might block audio if there wasn't a prior user interaction. We catch the error to prevent console spam.
+                    console.debug("Audio play was prevented by the browser.");
+                });
+            });
 
             emotionWheel.appendChild(petal);
         });
@@ -807,6 +823,9 @@
 
         // Skip button drops pin with empty note
         document.getElementById('cancel-note').addEventListener('click', () => {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => console.debug("Audio play was prevented by the browser."));
+
             if (pendingLatLng && selectedEmotionForNote) {
                 addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, "");
             }
@@ -814,6 +833,9 @@
         });
 
         document.getElementById('submit-note').addEventListener('click', () => {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => console.debug("Audio play was prevented by the browser."));
+
             if (pendingLatLng && selectedEmotionForNote) {
                 const noteText = noteInput.value.trim();
                 addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, noteText);
