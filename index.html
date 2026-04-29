@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodMap</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Add Leaflet for Real Maps -->
@@ -31,9 +36,15 @@
             padding: 0;
             height: 100%;
             font-family: "DynaPuff", system-ui;
-            background-color: #fcfaf7;
-            color: #4a443f;
+            background-color: var(--bg-color, #fcfaf7);
+            color: var(--text-color, #4a443f);
             overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark body, .dark html {
+            --bg-color: #1c1917; /* stone-900 */
+            --text-color: #f5f5f4; /* stone-100 */
         }
 
         .map-container {
@@ -43,19 +54,24 @@
             width: 100%;
             height: 100%;
             z-index: 10;
-            background: #fdfaf5;
+            background: var(--bg-color, #fdfaf5);
             cursor: crosshair;
         }
 
-        /* Leaflet Pastel Adjustments */
+        /* Leaflet Adjustments */
         .leaflet-tile {
             /* Boosts CartoDB Positron's subtle blues (water) and greens (parks) while keeping roads gray/white */
             filter: saturate(2.5) contrast(1.05) brightness(1.02);
             opacity: 0.95;
+            transition: filter 0.3s ease;
+        }
+        
+        .dark .leaflet-tile {
+            filter: saturate(1.5) contrast(1.1) brightness(0.9);
         }
         
         .leaflet-container {
-            background: #fdfaf5 !important;
+            background: var(--bg-color, #fdfaf5) !important;
             font-family: "DynaPuff", system-ui;
         }
 
@@ -67,10 +83,15 @@
         }
 
         .leaflet-control-zoom a {
-            color: #4a443f !important;
-            background-color: rgba(253, 250, 245, 0.9) !important;
+            color: var(--text-color, #4a443f) !important;
+            background-color: var(--control-bg, rgba(253, 250, 245, 0.9)) !important;
             backdrop-filter: blur(4px);
-            border-color: #e5dfd3 !important;
+            border-color: var(--control-border, #e5dfd3) !important;
+        }
+        
+        .dark .leaflet-control-zoom a {
+            --control-bg: rgba(28, 25, 23, 0.9); /* stone-900 */
+            --control-border: #44403c; /* stone-700 */
         }
 
         /* Community Gradient Clouds */
@@ -90,9 +111,14 @@
             /* Creates a soft radial gradient that fades perfectly to transparent */
             background: radial-gradient(circle, currentColor 0%, rgba(255,255,255,0) 65%);
             opacity: 0.45;
-            /* Multiply blend mode forces overlapping colors to mix (e.g. Yellow + Cyan = Greenish) */
+            /* Multiply blend mode forces overlapping colors to mix */
             mix-blend-mode: multiply;
             animation: cloudFadeIn 1.5s ease-out forwards;
+        }
+        
+        .dark .mood-cloud {
+            mix-blend-mode: screen; /* Works better on dark backgrounds */
+            opacity: 0.55; /* Slightly boost opacity on dark */
         }
 
         .mood-cloud.new-entry {
@@ -136,9 +162,13 @@
 
         #wheel-overlay.active {
             pointer-events: auto;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 65px, rgba(252, 250, 247, 0.5) 240px);
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 65px, var(--wheel-bg-mask, rgba(252, 250, 247, 0.5)) 240px);
             backdrop-filter: blur(3px);
             transition: backdrop-filter 0.3s ease;
+        }
+        
+        .dark #wheel-overlay.active {
+            --wheel-bg-mask: rgba(28, 25, 23, 0.6);
         }
 
         .emotion-wheel {
@@ -159,15 +189,18 @@
             position: absolute;
             width: 12px;
             height: 12px;
-            background: #4a443f;
+            background: var(--text-color, #4a443f);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 0 4px rgba(255,255,255,0.7);
+            box-shadow: 0 0 0 4px var(--wheel-border, rgba(255,255,255,0.7));
+        }
+        
+        .dark .wheel-center {
+            --wheel-border: rgba(0,0,0,0.5);
         }
 
         .wheel-petal {
             position: absolute;
-            /* Shrunk the transparent hitbox strictly to the core of the icon to prevent overlapping */
             width: 60px; 
             height: 60px;
             border-radius: 50%;
@@ -192,14 +225,13 @@
 
         .wheel-petal span {
             position: absolute;
-            /* Adjusted position further down to accommodate the overflowing images */
             bottom: -40px;
             font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #4a443f;
-            background: rgba(255,255,255,0.9);
+            color: var(--text-color, #4a443f);
+            background: var(--popup-bg, rgba(255,255,255,0.9));
             padding: 3px 8px;
             border-radius: 6px;
             opacity: 0;
@@ -210,6 +242,10 @@
             z-index: 20;
         }
 
+        .dark .wheel-petal span {
+            --popup-bg: rgba(41, 37, 36, 0.95); /* stone-800 */
+        }
+
         .wheel-petal:hover span {
             opacity: 1;
             transform: translateY(0) translateZ(0);
@@ -218,15 +254,20 @@
         /* Custom Popup */
         .custom-popup .leaflet-popup-content-wrapper {
             font-family: "DynaPuff", system-ui;
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: var(--popup-bg, rgba(255, 255, 255, 0.95)) !important;
             border-radius: 16px !important;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-            color: #4a443f !important;
+            color: var(--text-color, #4a443f) !important;
             padding: 4px !important;
         }
         
         .custom-popup .leaflet-popup-tip {
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: var(--popup-bg, rgba(255, 255, 255, 0.95)) !important;
+        }
+        
+        .dark .custom-popup .leaflet-popup-content-wrapper,
+        .dark .custom-popup .leaflet-popup-tip {
+            --popup-bg: rgba(41, 37, 36, 0.95); /* stone-800 */
         }
         
         .custom-popup .leaflet-popup-content {
@@ -248,6 +289,16 @@
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(0,0,0,0.25);
+        }
+        
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.25);
         }
 
         /* Floating UI Elements */
@@ -278,7 +329,7 @@
         }
     </style>
 </head>
-<body class="dynapuff-regular antialiased">
+<body class="dynapuff-regular antialiased transition-colors duration-300">
 
     <!-- Map Container -->
     <div class="map-container" id="map"></div>
@@ -292,41 +343,56 @@
     </div>
 
     <!-- Floating Header -->
-    <header class="overlay-ui top-6 left-6 right-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-start justify-center">
-            <img src="moodmap.png" alt="MoodMap Logo" class="h-8 w-auto object-contain">
-            <p class="text-stone-500 text-xs mt-2">A collective emotional gradient of the city</p>
-        </div>
-        
-        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex gap-6 items-center">
-            <div class="text-center px-2">
-                <span class="block text-2xl font-light text-stone-800" id="total-entries">0</span>
-                <span class="text-stone-400 uppercase text-[11px] tracking-widest font-medium">Active Pulses</span>
-            </div>
-            <div class="h-8 w-px bg-stone-200"></div>
+    <header class="overlay-ui top-6 left-6 right-6 z-[1000] pointer-events-none">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-4 w-full relative">
             
-            <!-- Expandable Dominant Section -->
-            <div class="relative">
-                <button id="dominant-toggle" class="flex flex-col items-center justify-center focus:outline-none hover:bg-stone-50/80 px-4 py-1.5 -my-1.5 rounded-xl transition-colors cursor-pointer group">
-                    <span class="block text-xl font-medium text-stone-800 flex items-center justify-center gap-1.5" id="dominant-mood-wrapper">
-                        <span id="dominant-mood-content" class="flex items-center gap-1">
-                            <span id="dom-emoji" class="text-stone-400 text-sm font-medium">--</span>
-                        </span>
-                        <svg class="w-4 h-4 text-stone-400 group-hover:text-stone-600 transition-all duration-300" id="dominant-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </span>
-                    <span class="text-stone-400 uppercase text-[11px] tracking-widest font-medium mt-1">Dominant</span>
-                </button>
+            <!-- Left Logo Block -->
+            <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-start justify-center transition-colors duration-300">
+                <img src="moodmap.png" alt="MoodMap Logo" class="h-8 w-auto object-contain">
+                <p class="text-stone-500 dark:text-stone-400 text-xs mt-2 transition-colors duration-300">A collective emotional gradient of the city</p>
+            </div>
+            
+            <!-- Right Section: Stats Box & Theme Toggle -->
+            <div class="flex flex-col md:flex-row items-start md:items-start gap-4 pointer-events-none w-full md:w-auto">
                 
-                <!-- Expandable Ranked List -->
-                <div id="ranked-list-container" class="absolute top-[110%] right-0 mt-2 bg-white/95 backdrop-blur-xl border border-stone-100 shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-2xl w-56 overflow-hidden opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 z-[1001]">
-                    <div class="p-3 bg-stone-50/80 border-b border-stone-100 flex justify-between items-center">
-                        <span class="text-[11px] font-medium uppercase tracking-widest text-stone-400">Emotion Ranking</span>
+                <!-- Stats Box -->
+                <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex gap-6 items-center transition-colors duration-300">
+                    <div class="text-center px-2">
+                        <span class="block text-2xl font-light text-stone-800 dark:text-stone-100 transition-colors duration-300" id="total-entries">0</span>
+                        <span class="text-stone-400 dark:text-stone-500 uppercase text-[11px] tracking-widest font-medium transition-colors duration-300">Active Pulses</span>
                     </div>
-                    <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1 text-left">
-                        <!-- Populated via JS -->
-                        <div class="p-6 text-center text-stone-400 text-sm font-medium">No moods visible<br>in this area</div>
+                    <div class="h-8 w-px bg-stone-200 dark:bg-stone-700 transition-colors duration-300"></div>
+                    
+                    <!-- Expandable Dominant Section -->
+                    <div class="relative">
+                        <button id="dominant-toggle" class="flex flex-col items-center justify-center focus:outline-none hover:bg-stone-50/80 dark:hover:bg-stone-800/80 px-4 py-1.5 -my-1.5 rounded-xl transition-colors cursor-pointer group">
+                            <span class="block text-xl font-medium text-stone-800 dark:text-stone-100 flex items-center justify-center gap-1.5 transition-colors duration-300" id="dominant-mood-wrapper">
+                                <span id="dominant-mood-content" class="flex items-center gap-1">
+                                    <span id="dom-emoji" class="text-stone-400 dark:text-stone-500 text-sm font-medium transition-colors duration-300">--</span>
+                                </span>
+                                <svg class="w-4 h-4 text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-all duration-300" id="dominant-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                            <span class="text-stone-400 dark:text-stone-500 uppercase text-[11px] tracking-widest font-medium mt-1 transition-colors duration-300">Dominant</span>
+                        </button>
+                        
+                        <!-- Expandable Ranked List -->
+                        <div id="ranked-list-container" class="absolute top-[110%] right-0 mt-2 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl border border-stone-100 dark:border-stone-800 shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-2xl w-56 overflow-hidden opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 z-[1001]">
+                            <div class="p-3 bg-stone-50/80 dark:bg-stone-800/80 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center transition-colors duration-300">
+                                <span class="text-[11px] font-medium uppercase tracking-widest text-stone-400 dark:text-stone-500 transition-colors duration-300">Emotion Ranking</span>
+                            </div>
+                            <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1 text-left">
+                                <!-- Populated via JS -->
+                                <div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-medium transition-colors duration-300">No moods visible<br>in this area</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Theme Toggle (Fixed Top Right Mobile, Relative Desktop) -->
+                <button id="theme-toggle" class="pointer-events-auto absolute top-0 right-0 md:relative bg-white/90 dark:bg-stone-900/90 backdrop-blur-md p-2.5 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 text-stone-400 hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-300 transition-all duration-300 hover:scale-105 focus:outline-none flex-shrink-0" aria-label="Toggle Theme">
+                    <svg id="moon-icon" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="sun-icon" class="hidden w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
             </div>
         </div>
     </header>
@@ -336,19 +402,19 @@
         
         <!-- Locate Me Text Button -->
         <div id="locate-btn-container" class="transition-opacity duration-300">
-            <button id="locate-btn" class="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 text-stone-600 hover:text-stone-900 hover:bg-white hover:scale-105 transition-all font-medium tracking-wide flex items-center gap-2" title="Locate Me">
+            <button id="locate-btn" class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-white dark:hover:bg-stone-800 hover:scale-105 transition-all font-medium tracking-wide flex items-center gap-2" title="Locate Me">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
                 <span id="locate-text">Locate Me</span>
             </button>
         </div>
 
         <!-- Floating Legend -->
-        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 flex flex-col items-center gap-3 w-max max-w-[95vw]">
+        <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-center gap-3 w-max max-w-[95vw] transition-colors duration-300">
             <div class="flex items-center gap-3">
-                <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400">Filter by Mood</span>
-                <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 hover:text-stone-800 transition-colors bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
+                <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400 dark:text-stone-500 transition-colors duration-300">Filter by Mood</span>
+                <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
             </div>
-            <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600">
+            <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600 dark:text-stone-300 transition-colors duration-300">
                 <!-- Dynamically generated legend items -->
             </div>
         </div>
@@ -356,21 +422,21 @@
     </div>
 
     <!-- Note Modal -->
-    <div id="note-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/20 backdrop-blur-sm">
-        <div class="bg-white/95 p-6 rounded-3xl shadow-xl border border-stone-100 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0 relative" id="note-modal-content">
+    <div id="note-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm transition-colors duration-300">
+        <div class="bg-white/95 dark:bg-stone-900/95 p-6 rounded-3xl shadow-xl border border-stone-100 dark:border-stone-800 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0 relative" id="note-modal-content">
             
             <!-- X Close Button to Abort -->
-            <button id="close-modal-x" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none p-1 rounded-full hover:bg-stone-100" aria-label="Cancel">
+            <button id="close-modal-x" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-300 transition-colors focus:outline-none p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Cancel">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
-            <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 transition-colors">Add a note</span></h3>
-            <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['DynaPuff'] text-stone-700 placeholder-stone-400">
+            <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 dark:text-stone-100 transition-colors">Add a note</span></h3>
+            <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 dark:bg-stone-800/50 border-2 border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['DynaPuff'] text-stone-700 dark:text-stone-200 placeholder-stone-400 dark:placeholder-stone-500">
             <div class="flex justify-between items-center mt-4">
-                <span class="text-lg text-stone-400"><span id="char-count">0</span>/50</span>
+                <span class="text-lg text-stone-400 dark:text-stone-500"><span id="char-count">0</span>/50</span>
                 <div class="flex gap-2 text-lg">
-                    <button id="cancel-note" class="px-4 py-2 rounded-xl text-stone-500 hover:bg-stone-100 transition-colors font-medium">Skip</button>
-                    <button id="submit-note" class="px-4 py-2 rounded-xl bg-stone-800 text-white hover:opacity-80 transition-opacity shadow-md font-medium">Drop Pin</button>
+                    <button id="cancel-note" class="px-4 py-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors font-medium">Skip</button>
+                    <button id="submit-note" class="px-4 py-2 rounded-xl bg-stone-800 dark:bg-stone-100 text-white dark:text-stone-900 hover:opacity-80 transition-opacity shadow-md font-medium">Drop Pin</button>
                 </div>
             </div>
         </div>
@@ -395,6 +461,7 @@
         let selectedEmotionForNote = null;
         let userLocation = null;
         let activeFilters = []; // Updated to support multiple filters
+        let isDarkMode = false;
 
         // Initialize Audio objects
         const hoverSound = new Audio('hover.mp3');
@@ -402,6 +469,11 @@
 
         const clickSound = new Audio('click.mp3');
         clickSound.preload = 'auto'; // Preload the click sound
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
 
         // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
         const map = L.map('map', {
@@ -412,6 +484,30 @@
         });
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Tile layer setup (Start with Light)
+        let tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 18
+        }).addTo(map);
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                tileLayer.setUrl('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                tileLayer.setUrl('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+            }
+        }
+        
+        themeToggleBtn.addEventListener('click', toggleTheme);
 
         // Initialize Overlapping Marker Spiderfier (OMS)
         const oms = new OverlappingMarkerSpiderfier(map, {
@@ -434,15 +530,6 @@
             globalPopup.setLatLng(marker.getLatLng());
             map.openPopup(globalPopup);
         });
-
-        // Add CartoDB Positron 
-        // This provider uses white/gray for all roads.
-        // Combined with our CSS filters, the subtle water/parks become vibrant pastels.
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 18
-        }).addTo(map);
 
         // Set up Emotion Wheel
         const wheelOverlay = document.getElementById('wheel-overlay');
@@ -536,7 +623,7 @@
             // Add a tiny interactive pulsating dot to click and see the emotion & note
             const dotIcon = L.divIcon({
                 className: 'custom-leaflet-note',
-                html: `<div class="w-4 h-4 rounded-full border-[2px] border-white cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
+                html: `<div class="w-4 h-4 rounded-full border-[2px] border-white dark:border-stone-900 cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
                 iconSize: [16, 16],
                 iconAnchor: [8, 8]
             });
@@ -550,7 +637,7 @@
             
             // Append note text if it exists
             if (note) {
-                popupHtml += `<div class="mt-2 text-[1.1rem] text-stone-600 border-t border-stone-200 pt-2 break-words max-w-[200px] whitespace-normal leading-tight">${note}</div>`;
+                popupHtml += `<div class="mt-2 text-[1.1rem] text-stone-600 dark:text-stone-300 border-t border-stone-200 dark:border-stone-700 pt-2 break-words max-w-[200px] whitespace-normal leading-tight">${note}</div>`;
             }
             
             popupHtml += `</div>`;
@@ -611,20 +698,20 @@
                     const rankNum = index + 1;
                     
                     rankedListContent.innerHTML += `
-                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-stone-50 transition-colors ${opacityClass}">
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors ${opacityClass}">
                             <div class="flex items-center gap-2.5">
-                                <span class="text-[10px] font-medium text-stone-300 w-3 text-right">${rankNum}</span>
+                                <span class="text-[10px] font-medium text-stone-300 dark:text-stone-600 w-3 text-right">${rankNum}</span>
                                 <div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div>
                                 <span class="font-medium text-sm tracking-wide" style="color: ${emo.color}">${emo.label}</span>
                             </div>
-                            <span class="text-xs font-medium text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">${count}</span>
+                            <span class="text-xs font-medium text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">${count}</span>
                         </div>
                     `;
                 });
             } else {
-                dominantMoodContentEl.innerHTML = `<span id="dom-emoji" class="text-stone-400 text-sm font-medium">--</span>`;
+                dominantMoodContentEl.innerHTML = `<span id="dom-emoji" class="text-stone-400 dark:text-stone-500 text-sm font-medium">--</span>`;
                 rankedListContent.innerHTML = `
-                    <div class="p-6 text-center text-stone-400 text-sm font-normal">No moods visible<br>in this area</div>
+                    <div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-normal">No moods visible<br>in this area</div>
                 `;
             }
         }
@@ -724,7 +811,7 @@
                 // Dim item if there are active filters, but THIS item is not one of them
                 const isDimmed = activeFilters.length > 0 && !isActive; 
                 
-                item.className = `legend-item flex items-center gap-1.5 px-2 py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 shadow-inner' : ''}`;
+                item.className = `legend-item flex items-center gap-1.5 px-2 py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 dark:bg-stone-800 shadow-inner' : ''}`;
                 item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${emo.color}; box-shadow: 0 0 5px ${emo.color}"></span> ${emo.label}`;
                 item.onclick = () => toggleFilter(emo.id);
                 legendContainer.appendChild(item);
