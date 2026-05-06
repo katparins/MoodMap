@@ -442,7 +442,28 @@
         </div>
     </div>
 
-    <script>
+    <!-- Use module type to properly load Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Firebase
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const firebaseConfig = JSON.parse(firebaseConfigStr);
+        let app, auth, db;
+        
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.warn("Firebase not initialized correctly. Operating in offline/local mode only.");
+        }
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let currentUser = null;
+
         const emotions = [
             { id: 'happy', image: 'happy.png', color: '#F4C430', label: 'Happy', scale: 'scale-[1.4]' },
             { id: 'sad', image: 'sad.png', color: '#07addb', label: 'Sad', scale: 'scale-[1.6]' },
@@ -476,17 +497,17 @@
         const moonIcon = document.getElementById('moon-icon');
 
         // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
-        const map = L.map('map', {
+        const map = window.L.map('map', {
             center: [40.7300, -73.9900], // New York City (Lower Manhattan focused)
             zoom: 13, // City scale
             minZoom: 11,
             zoomControl: false 
         });
 
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        window.L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         // Tile layer setup (Start with Light)
-        let tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        let tileLayer = window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 18
@@ -510,14 +531,14 @@
         themeToggleBtn.addEventListener('click', toggleTheme);
 
         // Initialize Overlapping Marker Spiderfier (OMS)
-        const oms = new OverlappingMarkerSpiderfier(map, {
+        const oms = new window.OverlappingMarkerSpiderfier(map, {
             keepSpiderfied: true, // Keep the web open when reading a note
             legWeight: 2.5,
             legColors: { usual: '#d6d3d1', highlighted: '#78716c' } // Subtle stone colors for the spider legs
         });
 
         // Global popup for the spiderfied markers
-        const globalPopup = L.popup({
+        const globalPopup = window.L.popup({
             offset: [0, -4],
             className: 'custom-popup',
             closeButton: false,
@@ -573,7 +594,7 @@
         });
 
         function openWheelAt(lat, lng) {
-            pendingLatLng = L.latLng(lat, lng);
+            pendingLatLng = window.L.latLng(lat, lng);
             const containerPoint = map.latLngToContainerPoint(pendingLatLng);
             
             wheelOverlay.classList.add('active');
@@ -603,7 +624,8 @@
             }
         }
 
-        function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "") {
+        // Modified to support syncing and tracking unique doc ID
+        function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "", docId = null) {
             // Auto-clear filters if user drops a new pin that doesn't match current active filters
             if (isUserEntry && activeFilters.length > 0 && !activeFilters.includes(emotion.id)) {
                 activeFilters = [];
@@ -611,24 +633,24 @@
                 renderLegend();
             }
 
-            const customIcon = L.divIcon({
+            const customIcon = window.L.divIcon({
                 className: 'custom-leaflet-cloud',
                 html: `<div class="mood-cloud ${isUserEntry ? 'new-entry' : ''}" style="color: ${emotion.color};"></div>`,
                 iconSize: [0, 0], // CSS now handles dynamic sizing based on zoom
                 iconAnchor: [0, 0] // Center precisely on the coordinates
             });
 
-            const cloudMarker = L.marker([lat, lng], {icon: customIcon, interactive: false});
+            const cloudMarker = window.L.marker([lat, lng], {icon: customIcon, interactive: false});
 
             // Add a tiny interactive pulsating dot to click and see the emotion & note
-            const dotIcon = L.divIcon({
+            const dotIcon = window.L.divIcon({
                 className: 'custom-leaflet-note',
                 html: `<div class="w-4 h-4 rounded-full border-[2px] border-white dark:border-stone-900 cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
                 iconSize: [16, 16],
                 iconAnchor: [8, 8]
             });
             
-            const dotMarker = L.marker([lat, lng], {icon: dotIcon, interactive: true});
+            const dotMarker = window.L.marker([lat, lng], {icon: dotIcon, interactive: true});
             
             // Build the popup content
             let popupHtml = `<div class="flex flex-col items-center justify-center">
@@ -654,7 +676,7 @@
             }
 
             // Store the exact coordinates and markers so we can check if it's on screen and toggle visibility later
-            entries.push({ id: emotion.id, lat: lat, lng: lng, cloudMarker, dotMarker });
+            entries.push({ id: emotion.id, lat: lat, lng: lng, cloudMarker, dotMarker, docId: docId });
 
             updateStats();
         }
@@ -914,7 +936,7 @@
             clickSound.play().catch(e => console.debug("Audio play was prevented by the browser."));
 
             if (pendingLatLng && selectedEmotionForNote) {
-                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, "");
+                saveMoodToDB(selectedEmotionForNote.id, pendingLatLng.lat, pendingLatLng.lng, "");
             }
             closeNoteModal();
         });
@@ -925,7 +947,7 @@
 
             if (pendingLatLng && selectedEmotionForNote) {
                 const noteText = noteInput.value.trim();
-                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, noteText);
+                saveMoodToDB(selectedEmotionForNote.id, pendingLatLng.lat, pendingLatLng.lng, noteText);
             }
             closeNoteModal();
         });
@@ -988,6 +1010,80 @@
             }
         });
 
+        // --- Database & Authentication Methods ---
+        async function saveMoodToDB(emotionId, lat, lng, note) {
+            // Local fallback if DB is not initialized
+            if (!currentUser || !db) {
+                const emotion = emotions.find(e => e.id === emotionId);
+                if (emotion) addGradientCloud(emotion, lat, lng, true, note);
+                return;
+            }
+
+            const moodsRef = collection(db, 'artifacts', appId, 'public', 'data', 'moods');
+            try {
+                await addDoc(moodsRef, {
+                    emotionId: emotionId,
+                    lat: lat,
+                    lng: lng,
+                    note: note,
+                    timestamp: Date.now(),
+                    userId: currentUser.uid
+                });
+            } catch (error) {
+                console.error("Error saving mood: ", error);
+                // Fallback to purely visual addition if connection fails
+                const emotion = emotions.find(e => e.id === emotionId);
+                if (emotion) addGradientCloud(emotion, lat, lng, true, note);
+            }
+        }
+
+        function setupMoodListener() {
+            if (!currentUser || !db) return;
+            const moodsRef = collection(db, 'artifacts', appId, 'public', 'data', 'moods');
+            
+            onSnapshot(moodsRef, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        const emotion = emotions.find(e => e.id === data.emotionId);
+                        if (emotion) {
+                            // Check if entry already exists to avoid dupes
+                            if (!entries.some(e => e.docId === change.doc.id)) {
+                                const isUserEntry = data.userId === currentUser.uid;
+                                addGradientCloud(emotion, data.lat, data.lng, isUserEntry, data.note || "", change.doc.id);
+                            }
+                        }
+                    }
+                });
+            }, (error) => {
+                console.error("Error listening to database changes: ", error);
+            });
+        }
+
+        // Initialize Authentication
+        const initAuth = async () => {
+            if (!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        };
+
+        if (auth) {
+            initAuth().then(() => {
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        setupMoodListener();
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
