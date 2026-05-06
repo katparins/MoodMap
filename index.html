@@ -43,8 +43,8 @@
         }
 
         .dark body, .dark html {
-            --bg-color: #1c1917; /* stone-900 */
-            --text-color: #f5f5f4; /* stone-100 */
+            --bg-color: #1c1917;
+            --text-color: #f5f5f4;
         }
 
         .map-container {
@@ -58,9 +58,7 @@
             cursor: crosshair;
         }
 
-        /* Leaflet Adjustments */
         .leaflet-tile {
-            /* Boosts CartoDB Positron's subtle blues (water) and greens (parks) while keeping roads gray/white */
             filter: saturate(2.5) contrast(1.05) brightness(1.02);
             opacity: 0.95;
             transition: filter 0.3s ease;
@@ -90,13 +88,12 @@
         }
         
         .dark .leaflet-control-zoom a {
-            --control-bg: rgba(28, 25, 23, 0.9); /* stone-900 */
-            --control-border: #44403c; /* stone-700 */
+            --control-bg: rgba(28, 25, 23, 0.9);
+            --control-border: #44403c;
         }
 
-        /* Community Gradient Clouds */
         .custom-leaflet-cloud {
-            pointer-events: none !important; /* Ensure we can click through clouds to the map */
+            pointer-events: none !important;
             overflow: visible;
         }
 
@@ -108,17 +105,15 @@
             left: 0;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            /* Creates a soft radial gradient that fades perfectly to transparent */
             background: radial-gradient(circle, currentColor 0%, rgba(255,255,255,0) 65%);
             opacity: 0.45;
-            /* Multiply blend mode forces overlapping colors to mix */
             mix-blend-mode: multiply;
             animation: cloudFadeIn 1.5s ease-out forwards;
         }
         
         .dark .mood-cloud {
-            mix-blend-mode: screen; /* Works better on dark backgrounds */
-            opacity: 0.55; /* Slightly boost opacity on dark */
+            mix-blend-mode: screen;
+            opacity: 0.55;
         }
 
         .mood-cloud.new-entry {
@@ -138,7 +133,6 @@
             to { opacity: 0.45; transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* Pulsating Emotion Dot Animation */
         @keyframes dotPulse {
             0% { box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 0 currentColor; }
             70% { box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 0 8px transparent; }
@@ -149,7 +143,6 @@
             animation: dotPulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
 
-        /* Emotion Wheel Overlay */
         #wheel-overlay {
             position: absolute;
             top: 0;
@@ -243,7 +236,7 @@
         }
 
         .dark .wheel-petal span {
-            --popup-bg: rgba(41, 37, 36, 0.95); /* stone-800 */
+            --popup-bg: rgba(41, 37, 36, 0.95);
         }
 
         .wheel-petal:hover span {
@@ -251,7 +244,6 @@
             transform: translateY(0) translateZ(0);
         }
 
-        /* Custom Popup */
         .custom-popup .leaflet-popup-content-wrapper {
             font-family: "DynaPuff", system-ui;
             background: var(--popup-bg, rgba(255, 255, 255, 0.95)) !important;
@@ -267,7 +259,7 @@
         
         .dark .custom-popup .leaflet-popup-content-wrapper,
         .dark .custom-popup .leaflet-popup-tip {
-            --popup-bg: rgba(41, 37, 36, 0.95); /* stone-800 */
+            --popup-bg: rgba(41, 37, 36, 0.95);
         }
         
         .custom-popup .leaflet-popup-content {
@@ -276,32 +268,14 @@
             text-align: center;
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.02);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.15);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.25);
-        }
-        
-        .dark .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.02);
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.15);
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.25);
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+        .dark .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
-        /* Floating UI Elements */
         .overlay-ui {
             position: absolute;
             z-index: 1000;
@@ -312,7 +286,6 @@
             pointer-events: auto;
         }
 
-        /* Legend Filter Styles */
         .legend-item {
             cursor: pointer;
             transition: all 0.2s ease;
@@ -327,6 +300,52 @@
         .legend-item.dimmed:hover {
             opacity: 0.6;
         }
+
+        /* Time filter button styles */
+        .time-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #78716c;
+        }
+        .time-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .dark .time-btn {
+            color: #a8a29e;
+        }
+        .dark .time-btn:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+        .time-btn.active {
+            background-color: #292524;
+            color: white;
+        }
+        .dark .time-btn.active {
+            background-color: #f5f5f4;
+            color: #1c1917;
+        }
+
+        /* Connection status indicator */
+        .connection-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 6px #10b981;
+        }
+        .connection-dot.disconnected {
+            background: #ef4444;
+            box-shadow: 0 0 6px #ef4444;
+        }
+        .connection-dot.connecting {
+            background: #f59e0b;
+            box-shadow: 0 0 6px #f59e0b;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
     </style>
 </head>
 <body class="dynapuff-regular antialiased transition-colors duration-300">
@@ -338,7 +357,6 @@
     <div id="wheel-overlay">
         <div class="emotion-wheel" id="emotion-wheel">
             <div class="wheel-center"></div>
-            <!-- Petals generated via JS -->
         </div>
     </div>
 
@@ -348,14 +366,17 @@
             
             <!-- Left Logo Block -->
             <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-start justify-center transition-colors duration-300">
-                <img src="moodmap.png" alt="MoodMap Logo" class="h-8 w-auto object-contain">
+                <img src="moodmap.png" alt="MoodMap Logo" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
                 <p class="text-stone-500 dark:text-stone-400 text-xs mt-2 transition-colors duration-300">A collective emotional gradient of the city</p>
+                <!-- Connection status -->
+                <div class="flex items-center gap-1.5 mt-2">
+                    <div class="connection-dot connecting" id="connection-dot"></div>
+                    <span class="text-[10px] uppercase tracking-widest font-medium text-stone-400 dark:text-stone-500" id="connection-status">Connecting...</span>
+                </div>
             </div>
             
             <!-- Right Section: Stats Box -->
             <div class="flex flex-col md:flex-row items-start md:items-start gap-4 pointer-events-none w-full md:w-auto">
-                
-                <!-- Stats Box -->
                 <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex gap-6 items-center transition-colors duration-300">
                     <div class="text-center px-2">
                         <span class="block text-2xl font-light text-stone-800 dark:text-stone-100 transition-colors duration-300" id="total-entries">0</span>
@@ -363,7 +384,6 @@
                     </div>
                     <div class="h-8 w-px bg-stone-200 dark:bg-stone-700 transition-colors duration-300"></div>
                     
-                    <!-- Expandable Dominant Section -->
                     <div class="relative">
                         <button id="dominant-toggle" class="flex flex-col items-center justify-center focus:outline-none hover:bg-stone-50/80 dark:hover:bg-stone-800/80 px-4 py-1.5 -my-1.5 rounded-xl transition-colors cursor-pointer group">
                             <span class="block text-xl font-medium text-stone-800 dark:text-stone-100 flex items-center justify-center gap-1.5 transition-colors duration-300" id="dominant-mood-wrapper">
@@ -375,13 +395,11 @@
                             <span class="text-stone-400 dark:text-stone-500 uppercase text-[11px] tracking-widest font-medium mt-1 transition-colors duration-300">Dominant</span>
                         </button>
                         
-                        <!-- Expandable Ranked List -->
                         <div id="ranked-list-container" class="absolute top-[110%] right-0 mt-2 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl border border-stone-100 dark:border-stone-800 shadow-[0_8px_30px_rgba(0,0,0,0.12)] rounded-2xl w-56 overflow-hidden opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 z-[1001]">
                             <div class="p-3 bg-stone-50/80 dark:bg-stone-800/80 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center transition-colors duration-300">
                                 <span class="text-[11px] font-medium uppercase tracking-widest text-stone-400 dark:text-stone-500 transition-colors duration-300">Emotion Ranking</span>
                             </div>
                             <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1 text-left">
-                                <!-- Populated via JS -->
                                 <div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-medium transition-colors duration-300">No moods visible<br>in this area</div>
                             </div>
                         </div>
@@ -391,16 +409,15 @@
         </div>
     </header>
 
-    <!-- Theme Toggle (Fixed Top Right separated from flex layout) -->
+    <!-- Theme Toggle -->
     <button id="theme-toggle" class="pointer-events-auto fixed top-6 right-2 md:right-4 z-[1002] bg-white/90 dark:bg-stone-900/90 backdrop-blur-md p-2.5 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 text-stone-400 hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-300 transition-all duration-300 hover:scale-105 focus:outline-none" aria-label="Toggle Theme">
         <svg id="moon-icon" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         <svg id="sun-icon" class="hidden w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     </button>
 
-    <!-- Bottom UI Stack (Locate Me & Legend) -->
+    <!-- Bottom UI Stack -->
     <div class="overlay-ui bottom-8 left-0 w-full flex flex-col items-center gap-4 z-[1000]">
         
-        <!-- Locate Me Text Button -->
         <div id="locate-btn-container" class="transition-opacity duration-300">
             <button id="locate-btn" class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-2.5 rounded-full shadow-lg border border-stone-100 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-white dark:hover:bg-stone-800 hover:scale-105 transition-all font-medium tracking-wide flex items-center gap-2" title="Locate Me">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
@@ -408,28 +425,33 @@
             </button>
         </div>
 
-        <!-- Floating Legend -->
+        <!-- Time Range Filter -->
+        <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-center gap-2 transition-colors duration-300">
+            <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400 dark:text-stone-500 transition-colors duration-300">Time Range</span>
+            <div class="flex gap-1 text-[11px] font-medium">
+                <button data-hours="1" class="time-btn px-3 py-1.5 rounded-full">Last Hour</button>
+                <button data-hours="24" class="time-btn px-3 py-1.5 rounded-full active">Today</button>
+                <button data-hours="168" class="time-btn px-3 py-1.5 rounded-full">This Week</button>
+                <button data-hours="0" class="time-btn px-3 py-1.5 rounded-full">All Time</button>
+            </div>
+        </div>
+
+        <!-- Mood Filter Legend -->
         <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-center gap-3 w-max max-w-[95vw] transition-colors duration-300">
             <div class="flex items-center gap-3">
                 <span class="text-[11px] uppercase tracking-widest font-medium text-stone-400 dark:text-stone-500 transition-colors duration-300">Filter by Mood</span>
                 <button id="clear-filter" class="hidden text-[10px] uppercase tracking-widest font-medium text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-colors bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 px-2 py-0.5 rounded-full cursor-pointer pointer-events-auto">Clear</button>
             </div>
-            <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600 dark:text-stone-300 transition-colors duration-300">
-                <!-- Dynamically generated legend items -->
-            </div>
+            <div id="legend-container" class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-stone-600 dark:text-stone-300 transition-colors duration-300"></div>
         </div>
-
     </div>
 
     <!-- Note Modal -->
     <div id="note-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm transition-colors duration-300">
         <div class="bg-white/95 dark:bg-stone-900/95 p-6 rounded-3xl shadow-xl border border-stone-100 dark:border-stone-800 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0 relative" id="note-modal-content">
-            
-            <!-- X Close Button to Abort -->
             <button id="close-modal-x" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-300 transition-colors focus:outline-none p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Cancel">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-
             <h3 class="text-2xl font-medium mb-2 pr-8"><span id="note-title-text" class="text-stone-800 dark:text-stone-100 transition-colors">Add a note</span></h3>
             <input type="text" id="note-input" maxlength="50" placeholder="What's on your mind?" class="w-full bg-stone-50 dark:bg-stone-800/50 border-2 border-stone-200 dark:border-stone-700 rounded-xl px-4 py-3 outline-none focus:ring-0 transition-colors text-base font-['DynaPuff'] text-stone-700 dark:text-stone-200 placeholder-stone-400 dark:placeholder-stone-500">
             <div class="flex justify-between items-center mt-4">
@@ -442,28 +464,52 @@
         </div>
     </div>
 
-    <!-- Use module type to properly load Firebase SDKs -->
+    <!-- ============================================ -->
+    <!-- FIREBASE INTEGRATION -->
+    <!-- ============================================ -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { 
+            getFirestore, collection, addDoc, onSnapshot, 
+            query, where, Timestamp, serverTimestamp,
+            doc, updateDoc, deleteDoc, orderBy
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Initialize Firebase
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        const firebaseConfig = JSON.parse(firebaseConfigStr);
-        let app, auth, db;
-        
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.warn("Firebase not initialized correctly. Operating in offline/local mode only.");
-        }
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let currentUser = null;
+        // ⚠️ REPLACE THIS WITH YOUR FIREBASE CONFIG ⚠️
+        // Get it from: Firebase Console → Project Settings → General → Your apps → Web app
+        const firebaseConfig = {
+            apiKey: "REMOVED_API_KEY",
+            authDomain: "moodmap-a806d.firebaseapp.com",
+            projectId: "moodmap-a806d",
+            storageBucket: "moodmap-a806d.firebasestorage.app",
+            messagingSenderId: "777610181227",
+            appId: "1:777610181227:web:dc19b76508e8d61c85cf2e"
+        };
 
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Expose Firestore methods to the main script (running as non-module)
+        window.firebase = {
+            db,
+            collection,
+            addDoc,
+            onSnapshot,
+            query,
+            where,
+            Timestamp,
+            serverTimestamp,
+            doc,
+            updateDoc,
+            deleteDoc,
+            orderBy
+        };
+
+        // Signal that Firebase is ready
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+
+    <script>
         const emotions = [
             { id: 'happy', image: 'happy.png', color: '#F4C430', label: 'Happy', scale: 'scale-[1.4]' },
             { id: 'sad', image: 'sad.png', color: '#07addb', label: 'Sad', scale: 'scale-[1.6]' },
@@ -481,33 +527,30 @@
         let pendingLatLng = null;
         let selectedEmotionForNote = null;
         let userLocation = null;
-        let activeFilters = []; // Updated to support multiple filters
+        let activeFilters = [];
         let isDarkMode = false;
+        let currentTimeRangeHours = 24; // Default: last 24 hours
+        let currentUnsubscribe = null;  // Active Firestore listener
 
-        // Initialize Audio objects
         const hoverSound = new Audio('hover.mp3');
-        hoverSound.preload = 'auto'; // Preload the audio to make it ready instantly
-
+        hoverSound.preload = 'auto';
         const clickSound = new Audio('click.mp3');
-        clickSound.preload = 'auto'; // Preload the click sound
+        clickSound.preload = 'auto';
 
-        // Theme Toggle Logic
         const themeToggleBtn = document.getElementById('theme-toggle');
         const sunIcon = document.getElementById('sun-icon');
         const moonIcon = document.getElementById('moon-icon');
 
-        // Initialize Real Leaflet Map - Centered on a City (e.g., NYC)
-        const map = window.L.map('map', {
-            center: [40.7300, -73.9900], // New York City (Lower Manhattan focused)
-            zoom: 13, // City scale
+        const map = L.map('map', {
+            center: [40.7300, -73.9900],
+            zoom: 13,
             minZoom: 11,
             zoomControl: false 
         });
 
-        window.L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Tile layer setup (Start with Light)
-        let tileLayer = window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        let tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 18
@@ -530,35 +573,32 @@
         
         themeToggleBtn.addEventListener('click', toggleTheme);
 
-        // Initialize Overlapping Marker Spiderfier (OMS)
-        const oms = new window.OverlappingMarkerSpiderfier(map, {
-            keepSpiderfied: true, // Keep the web open when reading a note
+        const oms = new OverlappingMarkerSpiderfier(map, {
+            keepSpiderfied: true,
             legWeight: 2.5,
-            legColors: { usual: '#d6d3d1', highlighted: '#78716c' } // Subtle stone colors for the spider legs
+            legColors: { usual: '#d6d3d1', highlighted: '#78716c' }
         });
 
-        // Global popup for the spiderfied markers
-        const globalPopup = window.L.popup({
+        const globalPopup = L.popup({
             offset: [0, -4],
             className: 'custom-popup',
             closeButton: false,
             minWidth: 80
         });
 
-        // Tell OMS to open the popup when a marker is clicked
         oms.addListener('click', function(marker) {
             globalPopup.setContent(marker.popupHtml);
             globalPopup.setLatLng(marker.getLatLng());
             map.openPopup(globalPopup);
         });
 
-        // Set up Emotion Wheel
+        // Build emotion wheel
         const wheelOverlay = document.getElementById('wheel-overlay');
         const emotionWheel = document.getElementById('emotion-wheel');
-        const radius = 105; // Tighter cluster radius
+        const radius = 105;
 
         emotions.forEach((emo, index) => {
-            const angle = (index / emotions.length) * 2 * Math.PI - (Math.PI / 2); // Start at top
+            const angle = (index / emotions.length) * 2 * Math.PI - (Math.PI / 2);
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
 
@@ -566,10 +606,7 @@
             petal.className = 'wheel-petal';
             petal.style.left = `${x}px`;
             petal.style.top = `${y}px`;
-            
-            // The image is absolute so it can freely overflow the strictly-sized 60x60 hitbox.
-            // The 85px size + scaling logic lets the visual remain huge while the mouse detection stays isolated.
-            petal.innerHTML = `<img src="${emo.image}" alt="${emo.label}" draggable="false" class="absolute w-[85px] h-[85px] max-w-none pointer-events-none object-contain drop-shadow-md ${emo.scale} transform-gpu"> <span>${emo.label}</span>`;
+            petal.innerHTML = `<img src="${emo.image}" alt="${emo.label}" draggable="false" class="absolute w-[85px] h-[85px] max-w-none pointer-events-none object-contain drop-shadow-md ${emo.scale} transform-gpu" onerror="this.style.display='none'"> <span>${emo.label}</span>`;
             
             petal.onclick = (e) => {
                 e.stopPropagation();
@@ -581,20 +618,16 @@
                 }
             };
             
-            // Add hover sound effect logic
             petal.addEventListener('mouseenter', () => {
-                hoverSound.currentTime = 0; // reset sound so it can play rapidly
-                hoverSound.play().catch(e => {
-                    // Browser might block audio if there wasn't a prior user interaction. We catch the error to prevent console spam.
-                    console.debug("Audio play was prevented by the browser.");
-                });
+                hoverSound.currentTime = 0;
+                hoverSound.play().catch(e => {});
             });
 
             emotionWheel.appendChild(petal);
         });
 
         function openWheelAt(lat, lng) {
-            pendingLatLng = window.L.latLng(lat, lng);
+            pendingLatLng = L.latLng(lat, lng);
             const containerPoint = map.latLngToContainerPoint(pendingLatLng);
             
             wheelOverlay.classList.add('active');
@@ -606,7 +639,6 @@
             emotionWheel.classList.add('open');
         }
 
-        // Map Interaction
         map.on('click', (e) => {
             openWheelAt(e.latlng.lat, e.latlng.lng);
         });
@@ -618,74 +650,241 @@
         function closeWheel() {
             wheelOverlay.classList.remove('active');
             emotionWheel.classList.remove('open');
-            // Only clear pendingLatLng if the modal isnt opening
             if (document.getElementById('note-modal').classList.contains('hidden')) {
                 pendingLatLng = null;
             }
         }
 
-        // Modified to support syncing and tracking unique doc ID
-        function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "", docId = null) {
-            // Auto-clear filters if user drops a new pin that doesn't match current active filters
-            if (isUserEntry && activeFilters.length > 0 && !activeFilters.includes(emotion.id)) {
-                activeFilters = [];
-                applyFilter();
-                renderLegend();
-            }
+        // ============================================
+        // RENDER A SINGLE ENTRY ON THE MAP
+        // (Called from Firestore listener OR locally for instant feedback)
+        // ============================================
+        function renderEntry(entryData, isUserEntry = false) {
+            const emotion = emotions.find(e => e.id === entryData.emotionId);
+            if (!emotion) return null;
 
-            const customIcon = window.L.divIcon({
+            const customIcon = L.divIcon({
                 className: 'custom-leaflet-cloud',
                 html: `<div class="mood-cloud ${isUserEntry ? 'new-entry' : ''}" style="color: ${emotion.color};"></div>`,
-                iconSize: [0, 0], // CSS now handles dynamic sizing based on zoom
-                iconAnchor: [0, 0] // Center precisely on the coordinates
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
             });
 
-            const cloudMarker = window.L.marker([lat, lng], {icon: customIcon, interactive: false});
+            const cloudMarker = L.marker([entryData.lat, entryData.lng], {icon: customIcon, interactive: false});
 
-            // Add a tiny interactive pulsating dot to click and see the emotion & note
-            const dotIcon = window.L.divIcon({
+            const dotIcon = L.divIcon({
                 className: 'custom-leaflet-note',
                 html: `<div class="w-4 h-4 rounded-full border-[2px] border-white dark:border-stone-900 cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
                 iconSize: [16, 16],
                 iconAnchor: [8, 8]
             });
             
-            const dotMarker = window.L.marker([lat, lng], {icon: dotIcon, interactive: true});
+            const dotMarker = L.marker([entryData.lat, entryData.lng], {icon: dotIcon, interactive: true});
             
-            // Build the popup content
             let popupHtml = `<div class="flex flex-col items-center justify-center">
-                <div class="w-14 h-14 flex items-center justify-center mb-1"><img src="${emotion.image}" alt="${emotion.label}" class="w-full h-full object-contain drop-shadow-md ${emotion.scale}"></div>
+                <div class="w-14 h-14 flex items-center justify-center mb-1"><img src="${emotion.image}" alt="${emotion.label}" class="w-full h-full object-contain drop-shadow-md ${emotion.scale}" onerror="this.style.display='none'"></div>
                 <span class="font-medium text-sm tracking-wide uppercase" style="color: ${emotion.color};">${emotion.label}</span>`;
             
-            // Append note text if it exists
-            if (note) {
-                popupHtml += `<div class="mt-2 text-[1.1rem] text-stone-600 dark:text-stone-300 border-t border-stone-200 dark:border-stone-700 pt-2 break-words max-w-[200px] whitespace-normal leading-tight">${note}</div>`;
+            if (entryData.note) {
+                popupHtml += `<div class="mt-2 text-[1.1rem] text-stone-600 dark:text-stone-300 border-t border-stone-200 dark:border-stone-700 pt-2 break-words max-w-[200px] whitespace-normal leading-tight">${escapeHtml(entryData.note)}</div>`;
             }
-            
             popupHtml += `</div>`;
 
-            // Assign HTML to marker for OMS to use
             dotMarker.popupHtml = popupHtml;
             
-            // Only add to map if it matches current filter criteria
             const shouldShow = activeFilters.length === 0 || activeFilters.includes(emotion.id);
             if (shouldShow) {
                 cloudMarker.addTo(map);
                 map.addLayer(dotMarker);
-                oms.addMarker(dotMarker); // Hand over click control to Spiderfier
+                oms.addMarker(dotMarker);
             }
 
-            // Store the exact coordinates and markers so we can check if it's on screen and toggle visibility later
-            entries.push({ id: emotion.id, lat: lat, lng: lng, cloudMarker, dotMarker, docId: docId });
+            const entry = {
+                docId: entryData.docId,
+                id: emotion.id,
+                lat: entryData.lat,
+                lng: entryData.lng,
+                note: entryData.note || "",
+                createdAt: entryData.createdAt,
+                cloudMarker,
+                dotMarker
+            };
+            entries.push(entry);
+            updateStats();
+            return entry;
+        }
 
+        function removeEntryFromMap(docId) {
+            const idx = entries.findIndex(e => e.docId === docId);
+            if (idx === -1) return;
+            const entry = entries[idx];
+            if (map.hasLayer(entry.cloudMarker)) map.removeLayer(entry.cloudMarker);
+            if (map.hasLayer(entry.dotMarker)) {
+                map.removeLayer(entry.dotMarker);
+                oms.removeMarker(entry.dotMarker);
+            }
+            entries.splice(idx, 1);
             updateStats();
         }
 
+        function clearAllEntries() {
+            entries.forEach(entry => {
+                if (map.hasLayer(entry.cloudMarker)) map.removeLayer(entry.cloudMarker);
+                if (map.hasLayer(entry.dotMarker)) {
+                    map.removeLayer(entry.dotMarker);
+                    oms.removeMarker(entry.dotMarker);
+                }
+            });
+            entries = [];
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // FIREBASE: SAVE NEW ENTRY
+        // ============================================
+        async function saveEntryToFirebase(emotion, lat, lng, note) {
+            if (!window.firebase) {
+                console.warn('Firebase not loaded yet');
+                return null;
+            }
+            try {
+                const { db, collection, addDoc, serverTimestamp } = window.firebase;
+                const docRef = await addDoc(collection(db, "moods"), {
+                    emotionId: emotion.id,
+                    lat: lat,
+                    lng: lng,
+                    note: note || "",
+                    createdAt: serverTimestamp()
+                });
+                console.log("Saved entry:", docRef.id);
+                return docRef.id;
+            } catch (err) {
+                console.error("Error saving entry:", err);
+                return null;
+            }
+        }
+
+        // ============================================
+        // FIREBASE: LOAD ENTRIES BY TIME RANGE
+        // ============================================
+        function loadMoodsForTimeRange(hoursAgo) {
+            if (!window.firebase) {
+                // Wait for Firebase to be ready
+                window.addEventListener('firebase-ready', () => loadMoodsForTimeRange(hoursAgo), { once: true });
+                return;
+            }
+
+            const { db, collection, query, where, Timestamp, onSnapshot, orderBy } = window.firebase;
+
+            // Stop the previous listener (important — prevents duplicate data)
+            if (currentUnsubscribe) {
+                currentUnsubscribe();
+                currentUnsubscribe = null;
+            }
+
+            // Clear current map
+            clearAllEntries();
+            setConnectionStatus('connecting');
+
+            // Build query
+            let q;
+            if (hoursAgo === 0 || hoursAgo > 99999) {
+                // "All Time" — no time filter
+                q = query(collection(db, "moods"), orderBy("createdAt", "desc"));
+            } else {
+                const cutoff = Timestamp.fromMillis(Date.now() - hoursAgo * 60 * 60 * 1000);
+                q = query(
+                    collection(db, "moods"),
+                    where("createdAt", ">", cutoff),
+                    orderBy("createdAt", "desc")
+                );
+            }
+
+            // Real-time listener — fires whenever data changes
+            currentUnsubscribe = onSnapshot(q, (snapshot) => {
+                setConnectionStatus('connected');
+                snapshot.docChanges().forEach(change => {
+                    const data = change.doc.data();
+                    const entryData = {
+                        docId: change.doc.id,
+                        emotionId: data.emotionId,
+                        lat: data.lat,
+                        lng: data.lng,
+                        note: data.note,
+                        createdAt: data.createdAt
+                    };
+
+                    if (change.type === "added") {
+                        // Skip if we already rendered this (e.g., the user just dropped it)
+                        if (!entries.find(e => e.docId === change.doc.id)) {
+                            renderEntry(entryData, false);
+                        }
+                    } else if (change.type === "modified") {
+                        // Re-render the entry
+                        removeEntryFromMap(change.doc.id);
+                        renderEntry(entryData, false);
+                    } else if (change.type === "removed") {
+                        removeEntryFromMap(change.doc.id);
+                    }
+                });
+            }, (error) => {
+                console.error("Firestore listener error:", error);
+                setConnectionStatus('disconnected');
+            });
+        }
+
+        // ============================================
+        // CONNECTION STATUS UI
+        // ============================================
+        function setConnectionStatus(status) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-status');
+            dot.classList.remove('connecting', 'disconnected');
+            if (status === 'connected') {
+                text.innerText = 'Live';
+            } else if (status === 'connecting') {
+                dot.classList.add('connecting');
+                text.innerText = 'Connecting...';
+            } else if (status === 'disconnected') {
+                dot.classList.add('disconnected');
+                text.innerText = 'Offline';
+            }
+        }
+
+        // ============================================
+        // ADD ENTRY (when user drops a pin)
+        // Saves to Firebase + shows immediately on map
+        // ============================================
+        async function addGradientCloud(emotion, lat, lng, isUserEntry = false, note = "") {
+            // Auto-clear filters if the new pin doesn't match active filter
+            if (isUserEntry && activeFilters.length > 0 && !activeFilters.includes(emotion.id)) {
+                activeFilters = [];
+                applyFilter();
+                renderLegend();
+            }
+
+            // 1. Save to Firebase
+            const docId = await saveEntryToFirebase(emotion, lat, lng, note);
+
+            // 2. Render immediately on map (don't wait for Firestore round-trip)
+            const entryData = {
+                docId: docId,
+                emotionId: emotion.id,
+                lat,
+                lng,
+                note,
+                createdAt: { toMillis: () => Date.now() } // Local fallback timestamp
+            };
+            renderEntry(entryData, isUserEntry);
+        }
+
         function updateStats() {
-            // Get the current visible boundaries of the map
             const bounds = map.getBounds();
-            
-            // Filter entries to only include those currently visible on screen AND matching the active filter
             const visibleEntries = entries.filter(entry => 
                 bounds.contains([entry.lat, entry.lng]) &&
                 (activeFilters.length === 0 || activeFilters.includes(entry.id))
@@ -702,28 +901,22 @@
                     return acc;
                 }, {});
                 
-                // Sort emotions based on count (descending)
                 const rankedEmotions = [...emotions].sort((a, b) => {
-                    const countA = counts[a.id] || 0;
-                    const countB = counts[b.id] || 0;
-                    return countB - countA;
+                    return (counts[b.id] || 0) - (counts[a.id] || 0);
                 });
                 
                 const domEmotion = rankedEmotions[0];
-                dominantMoodContentEl.innerHTML = `<div class="w-10 h-10 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}"></div> <span class="text-sm font-medium ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
+                dominantMoodContentEl.innerHTML = `<div class="w-10 h-10 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}" onerror="this.style.display='none'"></div> <span class="text-sm font-medium ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
                 
-                // Populate the Expandable Ranked List
                 rankedListContent.innerHTML = '';
                 rankedEmotions.forEach((emo, index) => {
                     const count = counts[emo.id] || 0;
                     const opacityClass = count > 0 ? 'opacity-100' : 'opacity-40';
-                    const rankNum = index + 1;
-                    
                     rankedListContent.innerHTML += `
                         <div class="flex items-center justify-between p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors ${opacityClass}">
                             <div class="flex items-center gap-2.5">
-                                <span class="text-[10px] font-medium text-stone-300 dark:text-stone-600 w-3 text-right">${rankNum}</span>
-                                <div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div>
+                                <span class="text-[10px] font-medium text-stone-300 dark:text-stone-600 w-3 text-right">${index + 1}</span>
+                                <div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}" onerror="this.style.display='none'"></div>
                                 <span class="font-medium text-sm tracking-wide" style="color: ${emo.color}">${emo.label}</span>
                             </div>
                             <span class="text-xs font-medium text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">${count}</span>
@@ -732,13 +925,11 @@
                 });
             } else {
                 dominantMoodContentEl.innerHTML = `<span id="dom-emoji" class="text-stone-400 dark:text-stone-500 text-sm font-medium">--</span>`;
-                rankedListContent.innerHTML = `
-                    <div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-normal">No moods visible<br>in this area</div>
-                `;
+                rankedListContent.innerHTML = `<div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-normal">No moods visible<br>in this area</div>`;
             }
         }
 
-        // --- Ranking List Toggle Logic ---
+        // Ranking dropdown
         let isRankingOpen = false;
         const dominantToggle = document.getElementById('dominant-toggle');
         const rankedListContainer = document.getElementById('ranked-list-container');
@@ -762,7 +953,6 @@
             toggleRankingMenu();
         });
 
-        // Close dropdown when clicking anywhere else
         document.addEventListener('click', (e) => {
             if (isRankingOpen && !dominantToggle.contains(e.target) && !rankedListContainer.contains(e.target)) {
                 isRankingOpen = false;
@@ -770,7 +960,6 @@
             }
         });
 
-        // Hide Locate button when user is zoomed in near their physical location
         function toggleLocateButton() {
             if (!userLocation) return;
             const center = map.getCenter();
@@ -778,7 +967,6 @@
             const zoom = map.getZoom();
             const locateContainer = document.getElementById('locate-btn-container');
             
-            // Distance in meters (< 200m) and Zoom level 15+ means they are looking at their area
             if (dist < 200 && zoom >= 15) {
                 locateContainer.classList.add('opacity-0', 'pointer-events-none');
             } else {
@@ -786,41 +974,49 @@
             }
         }
 
-        // Keeps the geographic area of the clouds consistent regardless of zoom
         function updateCloudSize() {
-            // Base size decreased by 70% (was 180px, now 54px) at default zoom level 13
             const baseSize = 54; 
             const baseZoom = 13;
             const currentZoom = map.getZoom();
-            
-            // Calculates the factor to shrink/grow based on zoom difference
             const zoomDiff = currentZoom - baseZoom;
             const newSize = baseSize * Math.pow(2, zoomDiff);
-            
             document.documentElement.style.setProperty('--cloud-size', `${newSize}px`);
         }
 
-        // Attach resize logic to map zoom event
         map.on('zoom', updateCloudSize);
-        
-        // Recalculate stats whenever the user moves or zooms the map
         map.on('moveend', () => {
             updateStats();
             toggleLocateButton();
         });
-        
         map.on('zoomend', toggleLocateButton);
-        
-        // Set initial cloud size
         updateCloudSize();
 
-        // --- Filter Logic ---
+        // ============================================
+        // TIME RANGE FILTER
+        // ============================================
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentTimeRangeHours = parseInt(btn.dataset.hours);
+                loadMoodsForTimeRange(currentTimeRangeHours);
+            });
+        });
+
+        // Auto-refresh every 5 minutes so old pins age out without needing a page reload
+        setInterval(() => {
+            if (currentTimeRangeHours > 0) {
+                loadMoodsForTimeRange(currentTimeRangeHours);
+            }
+        }, 5 * 60 * 1000);
+
+        // Mood filter legend
         const legendContainer = document.getElementById('legend-container');
         const clearFilterBtn = document.getElementById('clear-filter');
 
         function renderLegend() {
             legendContainer.innerHTML = '';
-            
             if (activeFilters.length > 0) {
                 clearFilterBtn.classList.remove('hidden');
             } else {
@@ -830,9 +1026,7 @@
             emotions.forEach(emo => {
                 const item = document.createElement('span');
                 const isActive = activeFilters.includes(emo.id);
-                // Dim item if there are active filters, but THIS item is not one of them
                 const isDimmed = activeFilters.length > 0 && !isActive; 
-                
                 item.className = `legend-item flex items-center gap-1.5 px-2 py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 dark:bg-stone-800 shadow-inner' : ''}`;
                 item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${emo.color}; box-shadow: 0 0 5px ${emo.color}"></span> ${emo.label}`;
                 item.onclick = () => toggleFilter(emo.id);
@@ -842,10 +1036,8 @@
 
         function toggleFilter(emoId) {
             if (activeFilters.includes(emoId)) {
-                // If already active, toggle it off by removing it from the array
                 activeFilters = activeFilters.filter(id => id !== emoId);
             } else {
-                // If not active, add it to the array
                 activeFilters.push(emoId);
             }
             applyFilter();
@@ -853,7 +1045,7 @@
         }
 
         clearFilterBtn.addEventListener('click', () => {
-            activeFilters = []; // Reset array
+            activeFilters = [];
             applyFilter();
             renderLegend();
         });
@@ -865,23 +1057,22 @@
                     if (!map.hasLayer(entry.cloudMarker)) map.addLayer(entry.cloudMarker);
                     if (!map.hasLayer(entry.dotMarker)) {
                         map.addLayer(entry.dotMarker);
-                        oms.addMarker(entry.dotMarker); // Re-add to Spiderfier
+                        oms.addMarker(entry.dotMarker);
                     }
                 } else {
                     if (map.hasLayer(entry.cloudMarker)) map.removeLayer(entry.cloudMarker);
                     if (map.hasLayer(entry.dotMarker)) {
                         map.removeLayer(entry.dotMarker);
-                        oms.removeMarker(entry.dotMarker); // Remove from Spiderfier
+                        oms.removeMarker(entry.dotMarker);
                     }
                 }
             });
             updateStats();
         }
 
-        // Initialize Legend
         renderLegend();
 
-        // --- Note Modal Logic ---
+        // Note modal
         const noteModal = document.getElementById('note-modal');
         const noteModalContent = document.getElementById('note-modal-content');
         const noteInput = document.getElementById('note-input');
@@ -893,8 +1084,6 @@
                 noteModalContent.classList.remove('scale-95', 'opacity-0');
                 noteModalContent.classList.add('scale-100', 'opacity-100');
                 noteInput.focus();
-                
-                // Colorize the input border, title, and button to match the selected emotion
                 if(selectedEmotionForNote) {
                     noteInput.style.borderColor = selectedEmotionForNote.color;
                     document.getElementById('note-title-text').style.color = selectedEmotionForNote.color;
@@ -911,13 +1100,10 @@
                 noteInput.value = '';
                 noteInput.style.borderColor = '';
                 charCount.innerText = '0';
-                
-                // Reset dynamic colors
                 document.getElementById('note-title-text').style.color = '';
                 document.getElementById('submit-note').style.backgroundColor = '';
-
                 selectedEmotionForNote = null;
-                pendingLatLng = null; // Clear coordinate lock
+                pendingLatLng = null;
             }, 300);
         }
 
@@ -925,29 +1111,23 @@
             charCount.innerText = e.target.value.length;
         });
 
-        // Cancel (X) button closes modal completely without pinning
-        document.getElementById('close-modal-x').addEventListener('click', () => {
-            closeNoteModal();
-        });
+        document.getElementById('close-modal-x').addEventListener('click', closeNoteModal);
 
-        // Skip button drops pin with empty note
         document.getElementById('cancel-note').addEventListener('click', () => {
             clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.debug("Audio play was prevented by the browser."));
-
+            clickSound.play().catch(e => {});
             if (pendingLatLng && selectedEmotionForNote) {
-                saveMoodToDB(selectedEmotionForNote.id, pendingLatLng.lat, pendingLatLng.lng, "");
+                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, "");
             }
             closeNoteModal();
         });
 
         document.getElementById('submit-note').addEventListener('click', () => {
             clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.debug("Audio play was prevented by the browser."));
-
+            clickSound.play().catch(e => {});
             if (pendingLatLng && selectedEmotionForNote) {
                 const noteText = noteInput.value.trim();
-                saveMoodToDB(selectedEmotionForNote.id, pendingLatLng.lat, pendingLatLng.lng, noteText);
+                addGradientCloud(selectedEmotionForNote, pendingLatLng.lat, pendingLatLng.lng, true, noteText);
             }
             closeNoteModal();
         });
@@ -958,7 +1138,7 @@
             }
         });
 
-        // --- Locate Me Logic ---
+        // Locate Me
         document.getElementById('locate-btn').addEventListener('click', () => {
             const btn = document.getElementById('locate-btn');
             const btnText = document.getElementById('locate-text');
@@ -970,7 +1150,6 @@
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     userLocation = { lat, lng };
-                    
                     btnText.innerText = 'Locate Me';
                     btn.classList.remove('animate-pulse', 'text-stone-400');
                     
@@ -981,11 +1160,11 @@
 
                     if (dist < 10 && currentZoom === targetZoom) {
                         openWheelAt(lat, lng);
-                        toggleLocateButton(); // Checks if it should be hidden
+                        toggleLocateButton();
                     } else {
                         map.once('moveend', () => {
                             openWheelAt(lat, lng);
-                            toggleLocateButton(); // Checks if it should be hidden
+                            toggleLocateButton();
                         });
                         map.flyTo([lat, lng], targetZoom, { animate: true, duration: 1.5 });
                     }
@@ -999,91 +1178,39 @@
                         btnText.innerText = 'Locate Me';
                     }, 2000);
                 });
-            } else {
-                btnText.innerText = 'Error';
-                btn.classList.remove('animate-pulse', 'text-stone-400');
-                btn.classList.add('text-red-500');
-                setTimeout(() => {
-                    btn.classList.remove('text-red-500');
-                    btnText.innerText = 'Locate Me';
-                }, 2000);
             }
         });
 
-        // --- Database & Authentication Methods ---
-        async function saveMoodToDB(emotionId, lat, lng, note) {
-            // Local fallback if DB is not initialized
-            if (!currentUser || !db) {
-                const emotion = emotions.find(e => e.id === emotionId);
-                if (emotion) addGradientCloud(emotion, lat, lng, true, note);
-                return;
-            }
-
-            const moodsRef = collection(db, 'artifacts', appId, 'public', 'data', 'moods');
-            try {
-                await addDoc(moodsRef, {
-                    emotionId: emotionId,
-                    lat: lat,
-                    lng: lng,
-                    note: note,
-                    timestamp: Date.now(),
-                    userId: currentUser.uid
-                });
-            } catch (error) {
-                console.error("Error saving mood: ", error);
-                // Fallback to purely visual addition if connection fails
-                const emotion = emotions.find(e => e.id === emotionId);
-                if (emotion) addGradientCloud(emotion, lat, lng, true, note);
-            }
+        // ============================================
+        // STARTUP: Load entries once Firebase is ready
+        // ============================================
+        if (window.firebase) {
+            loadMoodsForTimeRange(currentTimeRangeHours);
+        } else {
+            window.addEventListener('firebase-ready', () => {
+                loadMoodsForTimeRange(currentTimeRangeHours);
+            }, { once: true });
         }
 
-        function setupMoodListener() {
-            if (!currentUser || !db) return;
-            const moodsRef = collection(db, 'artifacts', appId, 'public', 'data', 'moods');
-            
-            onSnapshot(moodsRef, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added") {
-                        const data = change.doc.data();
-                        const emotion = emotions.find(e => e.id === data.emotionId);
-                        if (emotion) {
-                            // Check if entry already exists to avoid dupes
-                            if (!entries.some(e => e.docId === change.doc.id)) {
-                                const isUserEntry = data.userId === currentUser.uid;
-                                addGradientCloud(emotion, data.lat, data.lng, isUserEntry, data.note || "", change.doc.id);
-                            }
-                        }
-                    }
-                });
-            }, (error) => {
-                console.error("Error listening to database changes: ", error);
-            });
-        }
-
-        // Initialize Authentication
-        const initAuth = async () => {
-            if (!auth) return;
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
+        // ============================================
+        // ADMIN HELPERS — call from browser console
+        // ============================================
+        // Edit a note: editEntry("docId", { note: "new text" })
+        window.editEntry = async (docId, updates) => {
+            const { db, doc, updateDoc } = window.firebase;
+            await updateDoc(doc(db, "moods", docId), updates);
+            console.log("Updated", docId);
         };
-
-        if (auth) {
-            initAuth().then(() => {
-                onAuthStateChanged(auth, (user) => {
-                    currentUser = user;
-                    if (user) {
-                        setupMoodListener();
-                    }
-                });
-            });
-        }
+        // Delete: deleteEntry("docId")
+        window.deleteEntry = async (docId) => {
+            const { db, doc, deleteDoc } = window.firebase;
+            await deleteDoc(doc(db, "moods", docId));
+            console.log("Deleted", docId);
+        };
+        // List visible entries: listEntries()
+        window.listEntries = () => {
+            console.table(entries.map(e => ({ docId: e.docId, mood: e.id, note: e.note })));
+        };
     </script>
 </body>
 </html>
