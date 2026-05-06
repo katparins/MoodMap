@@ -367,7 +367,7 @@
             <!-- Left Logo Block -->
             <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-start justify-center transition-colors duration-300">
                 <img src="moodmap.png" alt="MoodMap Logo" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
-                <p class="text-stone-500 dark:text-stone-400 text-xs mt-2 transition-colors duration-300">A collective emotional gradient of the city</p>
+                <p class="text-stone-500 dark:text-stone-400 text-xs mt-2 transition-colors duration-300">A collective emotional gradient of the world</p>
                 <!-- Connection status -->
                 <div class="flex items-center gap-1.5 mt-2">
                     <div class="connection-dot connecting" id="connection-dot"></div>
@@ -544,7 +544,7 @@
         const map = L.map('map', {
             center: [40.7300, -73.9900],
             zoom: 13,
-            minZoom: 11,
+            minZoom: 2,
             zoomControl: false 
         });
 
@@ -556,8 +556,12 @@
             maxZoom: 18
         }).addTo(map);
 
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
+        // ============================================
+        // THEME SYSTEM — Manual toggle only
+        // ============================================
+        function setTheme(dark) {
+            if (dark === isDarkMode) return;
+            isDarkMode = dark;
             if (isDarkMode) {
                 document.documentElement.classList.add('dark');
                 sunIcon.classList.remove('hidden');
@@ -569,6 +573,10 @@
                 moonIcon.classList.remove('hidden');
                 tileLayer.setUrl('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
             }
+        }
+
+        function toggleTheme() {
+            setTheme(!isDarkMode);
         }
         
         themeToggleBtn.addEventListener('click', toggleTheme);
@@ -734,7 +742,7 @@
                 }
                 
                 if (timeAgo) {
-                    html += `<div class="mt-2 text-[10px] uppercase tracking-widest font-medium text-stone-400 dark:text-stone-500">${timeAgo}</div>`;
+                    html += `<div class="mt-2 text-[10px] tracking-widest font-medium text-stone-400 dark:text-stone-500">${timeAgo}</div>`;
                 }
                 
                 html += `</div>`;
