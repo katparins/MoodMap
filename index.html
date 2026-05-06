@@ -117,20 +117,45 @@
         }
 
         .mood-cloud.new-entry {
-            opacity: 0.7;
-            animation: cloudDropIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cloudImpact 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
             z-index: 999;
         }
 
-        @keyframes cloudDropIn {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            60% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+        @keyframes cloudImpact {
+            0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            25%  { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50%  { transform: translate(-50%, -50%) scale(1.4); opacity: 0.85; filter: saturate(1.5); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; filter: saturate(1); }
         }
 
         @keyframes cloudFadeIn {
             from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
             to { opacity: 0.45; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Satisfying bouncy drop animation for the dot */
+        @keyframes dropBounce {
+            0% { transform: translateY(-200px) scaleY(1.2) scaleX(0.8); opacity: 0; }
+            40% { transform: translateY(0) scaleY(0.7) scaleX(1.3); opacity: 1; }
+            60% { transform: translateY(-25px) scaleY(1) scaleX(1); }
+            80% { transform: translateY(0) scaleY(0.9) scaleX(1.1); }
+            90% { transform: translateY(-5px) scaleY(1) scaleX(1); }
+            100% { transform: translateY(0) scaleY(1) scaleX(1); opacity: 1; }
+        }
+
+        .dot-drop-in {
+            animation: dropBounce 0.5s cubic-bezier(0.28, 0.84, 0.42, 1) both;
+            transform-origin: bottom center;
+        }
+
+        /* Expanding ripple shockwave when the dot hits the ground */
+        @keyframes rippleOut {
+            0% { transform: scale(0.8); opacity: 1; border: 4px solid currentColor; }
+            100% { transform: scale(5); opacity: 0; border: 0px solid currentColor; }
+        }
+
+        .pin-ripple {
+            animation: rippleOut 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s both;
         }
 
         @keyframes dotPulse {
@@ -721,7 +746,10 @@
 
             const dotIcon = L.divIcon({
                 className: 'custom-leaflet-note',
-                html: `<div class="w-4 h-4 rounded-full border-[2px] border-white dark:border-stone-900 cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>`,
+                html: `<div class="relative w-4 h-4 ${isUserEntry ? 'dot-drop-in' : ''}">
+                    ${isUserEntry ? `<div class="absolute inset-0 rounded-full pointer-events-none pin-ripple" style="color: ${emotion.color};"></div>` : ''}
+                    <div class="w-full h-full rounded-full border-[2px] border-white dark:border-stone-900 cursor-pointer hover:scale-125 transition-transform duration-200 pulsate-effect" style="background-color: ${emotion.color}; color: ${emotion.color};"></div>
+                </div>`,
                 iconSize: [16, 16],
                 iconAnchor: [8, 8]
             });
@@ -940,6 +968,19 @@
                 createdAt: { toMillis: () => Date.now() } // Local fallback timestamp
             };
             renderEntry(entryData, isUserEntry);
+
+            // 3. If user dropped this pin, gently pan the map so it's centered enough
+            // to fully see the drop animation, especially if they pinned near the edge
+            if (isUserEntry) {
+                const point = map.latLngToContainerPoint([lat, lng]);
+                const size = map.getSize();
+                const margin = 80; // px of breathing room around the pin
+                const offEdge = point.x < margin || point.y < margin 
+                             || point.x > size.x - margin || point.y > size.y - margin;
+                if (offEdge) {
+                    map.panTo([lat, lng], { animate: true, duration: 0.6 });
+                }
+            }
         }
 
         function updateStats() {
