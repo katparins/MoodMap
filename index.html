@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodMap</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -578,7 +580,7 @@
                     bubbleSound.currentTime = 0;
                     bubbleSound.play().catch(e => {});
                 } catch (e) {}
-            }, 350);
+            }, 360);
         }
 
         const themeToggleBtn = document.getElementById('theme-toggle');
