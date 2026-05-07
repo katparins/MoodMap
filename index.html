@@ -445,8 +445,8 @@
         </div>
 
         <div class="pointer-events-auto bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-100 dark:border-stone-800 flex items-stretch transition-colors duration-300 w-full">
-            <div id="legend-wrap" class="relative flex-1 px-5 py-3 flex items-center justify-center min-h-[60px] transition-[padding] duration-200">
-                <div id="legend-container" class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px] font-semibold text-stone-600 dark:text-stone-300 transition-colors duration-300">
+            <div id="legend-wrap" class="relative flex-1 px-3 py-2 md:px-5 md:py-3 flex items-center justify-center min-h-[48px] md:min-h-[60px] transition-[padding] duration-200">
+                <div id="legend-container" class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 md:gap-x-3 md:gap-y-1.5 text-[10px] md:text-[11px] font-semibold text-stone-600 dark:text-stone-300 transition-colors duration-300">
                 </div>
                 <button id="clear-filter" class="invisible pointer-events-none opacity-0 absolute right-3 top-1/2 -translate-y-1/2 text-[9px] uppercase tracking-[0.15em] font-bold text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 transition-all duration-200 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 px-2.5 py-1 rounded-full cursor-pointer whitespace-nowrap">Clear All</button>
             </div>
@@ -1141,7 +1141,7 @@
                 const isActive = activeFilters.includes(emo.id);
                 const isDimmed = activeFilters.length > 0 && !isActive; 
                 const item = document.createElement('span');
-                item.className = `legend-item flex items-center gap-1.5 px-3 py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 dark:bg-stone-800 shadow-inner' : ''}`;
+                item.className = `legend-item flex items-center gap-1 md:gap-1.5 px-2 py-0.5 md:px-3 md:py-1 rounded-full ${isDimmed ? 'dimmed' : ''} ${isActive ? 'bg-stone-100 dark:bg-stone-800 shadow-inner' : ''}`;
                 item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${emo.color}; box-shadow: 0 0 5px ${emo.color}"></span> <span>${emo.label}</span>`;
                 item.onclick = () => {
                     if (activeFilters.includes(emo.id)) activeFilters = activeFilters.filter(id => id !== emo.id);
