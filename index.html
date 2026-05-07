@@ -558,6 +558,15 @@
         hoverSound.preload = 'auto';
         const clickSound = new Audio('click.mp3');
         clickSound.preload = 'auto';
+        const bubbleSound = new Audio('bubble.mp3');
+        bubbleSound.preload = 'auto';
+
+        function playBubble() {
+            try {
+                bubbleSound.currentTime = 0;
+                bubbleSound.play().catch(e => {});
+            } catch (e) {}
+        }
 
         const themeToggleBtn = document.getElementById('theme-toggle');
         const sunIcon = document.getElementById('sun-icon');
@@ -861,6 +870,7 @@
                     document.querySelectorAll('.tod-btn').forEach(b => b.classList.toggle('active', b.dataset.tod === 'all'));
                     applyFilter();
                 }
+                playBubble();
             }
             const docId = await saveEntryToFirebase(emotion, lat, lng, note);
             const entryData = { docId, emotionId: emotion.id, lat, lng, note, createdAt: { toMillis: () => Date.now() } };
