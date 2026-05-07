@@ -1,6 +1,4 @@
 // firebase-config.js
-// This file is gitignored — it contains your real Firebase keys.
-// Do NOT commit this file. See firebase-config.example.js for the template.
 
 window.firebaseConfig = {
     apiKey: "AIzaSyDloPAH7-Zz7FovpS78F5CPPM-Z5YQirTM",
