@@ -382,7 +382,7 @@
 
     <header class="overlay-ui top-3 left-4 right-4 md:top-5 md:left-6 md:right-6 z-[1000] pointer-events-none flex justify-between items-start">
         
-        <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-center justify-center transition-colors duration-300">
+        <div class="pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex flex-col items-center justify-center transition-colors duration-300 h-[68px]">
             <img src="moodmap.png" alt="MoodMap" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
             <div class="flex items-center gap-1 mt-1">
                 <div class="connection-dot connecting" id="connection-dot"></div>
@@ -402,7 +402,7 @@
                 </span>
             </div>
 
-            <div class="order-1 md:order-2 pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex gap-4 items-center transition-colors duration-300">
+            <div class="order-1 md:order-2 pointer-events-auto bg-white/90 dark:bg-stone-900/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-stone-100 dark:border-stone-800 flex gap-4 items-center transition-colors duration-300 h-[68px]">
                 <div class="text-center px-1">
                     <span class="block text-xl font-light text-stone-800 dark:text-stone-100 transition-colors duration-300" id="total-entries">0</span>
                     <span class="text-stone-400 dark:text-stone-500 uppercase text-[9px] tracking-widest font-medium transition-colors duration-300">Pulses</span>
@@ -424,7 +424,7 @@
                         <div class="p-3 bg-stone-50/80 dark:bg-stone-800/80 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center transition-colors duration-300">
                             <span class="text-[10px] font-medium uppercase tracking-widest text-stone-400 dark:text-stone-500 transition-colors duration-300">Emotion Ranking</span>
                         </div>
-                        <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1 text-left">
+                        <div id="ranked-list-content" class="max-h-[50vh] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-0.5 text-left">
                             <div class="p-6 text-center text-stone-400 dark:text-stone-500 text-sm font-medium transition-colors duration-300">No moods visible<br>in this area</div>
                         </div>
                     </div>
@@ -973,11 +973,11 @@
                 const counts = visibleEntries.reduce((acc, curr) => { acc[curr.id] = (acc[curr.id] || 0) + 1; return acc; }, {});
                 const rankedEmotions = [...emotions].sort((a, b) => (counts[b.id] || 0) - (counts[a.id] || 0));
                 const domEmotion = rankedEmotions[0];
-                dominantMoodContentEl.innerHTML = `<div class="w-7 h-7 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}" onerror="this.style.display='none'"></div> <span class="text-[11px] font-medium ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
+                dominantMoodContentEl.innerHTML = `<div class="w-7 h-7 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}" onerror="this.style.display='none'"></div> <span class="text-[11px] font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
                 rankedListContent.innerHTML = '';
                 rankedEmotions.forEach((emo, index) => {
                     const count = counts[emo.id] || 0;
-                    rankedListContent.innerHTML += `<div class="flex items-center justify-between p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors ${count > 0 ? '' : 'opacity-40'}"><div class="flex items-center gap-2.5"><span class="text-[10px] font-medium text-stone-300 dark:text-stone-600 w-3 text-right">${index+1}</span><div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div><span class="font-medium text-sm" style="color: ${emo.color}">${emo.label}</span></div><span class="text-xs font-medium text-stone-500 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">${count}</span></div>`;
+                    rankedListContent.innerHTML += `<div class="flex items-center justify-between px-2 py-1 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors ${count > 0 ? '' : 'opacity-40'}"><div class="flex items-center gap-2.5"><span class="text-[10px] font-medium text-stone-300 dark:text-stone-600 w-3 text-right">${index+1}</span><div class="w-8 h-8 flex items-center justify-center overflow-visible"><img src="${emo.image}" alt="${emo.label}" class="w-full h-full object-contain drop-shadow-sm ${emo.scale}"></div><span class="font-medium text-[12px]" style="color: ${emo.color}">${emo.label}</span></div><span class="text-[11px] font-medium text-stone-500 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">${count}</span></div>`;
                 });
             } else {
                 dominantMoodContentEl.innerHTML = `<span id="dom-emoji" class="text-stone-400 text-xs font-medium">--</span>`;
@@ -1050,13 +1050,37 @@
         const legendWrap = document.getElementById('legend-wrap');
         const clearFilterBtn = document.getElementById('clear-filter');
 
+        // On mobile, Clear All should sit inside the chip flex flow (next to last chip).
+        // On desktop, it floats absolute on the right with padding pushing chips left.
+        function placeClearButton() {
+            const isMobile = window.matchMedia('(max-width: 767px)').matches;
+            if (isMobile) {
+                if (clearFilterBtn.parentElement !== legendContainer) {
+                    legendContainer.appendChild(clearFilterBtn);
+                }
+                clearFilterBtn.classList.remove('absolute', 'right-3', 'top-1/2', '-translate-y-1/2');
+            } else {
+                if (clearFilterBtn.parentElement !== legendWrap) {
+                    legendWrap.appendChild(clearFilterBtn);
+                }
+                clearFilterBtn.classList.add('absolute', 'right-3', 'top-1/2', '-translate-y-1/2');
+            }
+        }
+        placeClearButton();
+        window.addEventListener('resize', () => {
+            placeClearButton();
+            renderLegend();
+        });
+
         function renderLegend() {
             legendContainer.innerHTML = '';
             const hasFilters = activeFilters.length > 0;
             clearFilterBtn.classList.toggle('invisible', !hasFilters);
             clearFilterBtn.classList.toggle('pointer-events-none', !hasFilters);
             clearFilterBtn.classList.toggle('opacity-0', !hasFilters);
-            legendWrap.classList.toggle('pr-24', hasFilters);
+            // Right-padding only matters on desktop where Clear All is absolutely positioned.
+            const isMobile = window.matchMedia('(max-width: 767px)').matches;
+            legendWrap.classList.toggle('pr-24', hasFilters && !isMobile);
             emotions.forEach(emo => {
                 const isActive = activeFilters.includes(emo.id);
                 const isDimmed = activeFilters.length > 0 && !isActive; 
@@ -1071,6 +1095,8 @@
                 };
                 legendContainer.appendChild(item);
             });
+            // Re-attach clear button (innerHTML reset above may have dropped it on mobile)
+            placeClearButton();
         }
 
         clearFilterBtn.addEventListener('click', () => { activeFilters = []; applyFilter(); renderLegend(); });
