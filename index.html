@@ -575,10 +575,12 @@
         bubbleSound.preload = 'auto';
 
         function playBubble() {
-            try {
-                bubbleSound.currentTime = 0;
-                bubbleSound.play().catch(e => {});
-            } catch (e) {}
+            setTimeout(() => {
+                try {
+                    bubbleSound.currentTime = 0;
+                    bubbleSound.play().catch(e => {});
+                } catch (e) {}
+            }, 360);
         }
 
         const themeToggleBtn = document.getElementById('theme-toggle');
