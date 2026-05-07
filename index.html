@@ -973,7 +973,7 @@
                 const counts = visibleEntries.reduce((acc, curr) => { acc[curr.id] = (acc[curr.id] || 0) + 1; return acc; }, {});
                 const rankedEmotions = [...emotions].sort((a, b) => (counts[b.id] || 0) - (counts[a.id] || 0));
                 const domEmotion = rankedEmotions[0];
-                dominantMoodContentEl.innerHTML = `<div class="w-7 h-7 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}" onerror="this.style.display='none'"></div> <span class="text-[11px] font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
+                dominantMoodContentEl.innerHTML = `<div class="w-7 h-7 flex items-center justify-center overflow-visible"><img src="${domEmotion.image}" alt="${domEmotion.label}" class="w-full h-full object-contain drop-shadow-sm ${domEmotion.scale}" onerror="this.style.display='none'"></div> <span class="text-[14px] font-semibold ml-1" style="color: ${domEmotion.color}">${domEmotion.label}</span>`;
                 rankedListContent.innerHTML = '';
                 rankedEmotions.forEach((emo, index) => {
                     const count = counts[emo.id] || 0;
