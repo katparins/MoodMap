@@ -462,9 +462,9 @@
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 text-[11px] font-medium">
                             <button data-range="yesterday" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700">Yesterday</button>
-                            <button data-range="24" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700 active">Today</button>
+                            <button data-range="24" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700">Today</button>
                             <button data-range="168" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700">This Week</button>
-                            <button data-range="0" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700">All Time</button>
+                            <button data-range="0" class="time-btn px-3 py-1.5 rounded-full border border-stone-200 dark:border-stone-700 active">All Time</button>
                         </div>
                     </div>
                     <div class="w-full h-px bg-stone-200/70 dark:bg-stone-800 transition-colors duration-300"></div>
@@ -563,7 +563,7 @@
         let userLocation = null;
         let activeFilters = [];
         let isDarkMode = false;
-        let currentTimeRange = '24'; 
+        let currentTimeRange = '0'; 
         let activeTimeOfDay = 'all';
         let currentUnsubscribe = null;  
 
