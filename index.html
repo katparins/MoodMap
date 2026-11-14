@@ -509,6 +509,8 @@
 
     <!-- Loads window.firebaseConfig from a gitignored file -->
     <script src="firebase-config.js"></script>
+    <!-- Loads window.CARTO_KEY for the map tiles -->
+    <script src="carto-config.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -594,8 +596,11 @@
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        let tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
+        const cartoTiles = (style) =>
+            `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(window.CARTO_KEY || '')}`;
+
+        let tileLayer = L.tileLayer(cartoTiles('light_all'), {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 18
         }).addTo(map);
@@ -605,10 +610,10 @@
             isDarkMode = dark;
             if (isDarkMode) {
                 document.documentElement.classList.add('dark');
-                tileLayer.setUrl('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+                tileLayer.setUrl(cartoTiles('dark_all'));
             } else {
                 document.documentElement.classList.remove('dark');
-                tileLayer.setUrl('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+                tileLayer.setUrl(cartoTiles('light_all'));
             }
             themeToggleBtn.setAttribute('aria-pressed', isDarkMode ? 'true' : 'false');
         }
