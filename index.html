@@ -59,7 +59,8 @@
         }
 
         .leaflet-tile {
-            filter: saturate(2.5) contrast(1.05) brightness(1.02);
+            /* #soften-map lightens the grey buildings (see the SVG near the top of <body>) */
+            filter: url(#soften-map) saturate(2.5);
             opacity: 0.95;
             transition: filter 0.3s ease;
         }
@@ -374,6 +375,18 @@
 </head>
 <body class="dynapuff-regular antialiased transition-colors duration-300">
 
+    <!-- Colour filter for the light map: lightens CARTO's grey buildings so the map stays soft.
+         Its colour table is filled in by softenMapTable() in the main script. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="soften-map" color-interpolation-filters="sRGB">
+            <feComponentTransfer>
+                <feFuncR type="table"/>
+                <feFuncG type="table"/>
+                <feFuncB type="table"/>
+            </feComponentTransfer>
+        </filter>
+    </svg>
+
     <div class="map-container" id="map"></div>
 
     <div id="wheel-overlay">
@@ -598,6 +611,33 @@
 
         const cartoTiles = (style) =>
             `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(window.CARTO_KEY || '')}`;
+
+        // CARTO's newer light map draws buildings in darker greys (~223-237) than it used to.
+        // Lighten them to a faint ~245 and the land (~250) to near-white, matching MoodMap's original look.
+        // Pairs are [input brightness, output brightness]; values in between are blended.
+        function softenMapTable() {
+            const points = [
+                [0, 0],
+                [220, 220],   // water, labels and darker details: unchanged
+                [225, 244],   // buildings start here
+                [240, 247],   // ...lightened to a faint grey
+                [250, 254],   // land: near-white
+                [255, 255]    // roads: white
+            ];
+            const values = [];
+            for (let v = 0; v < 256; v++) {
+                let out = 255;
+                for (let i = 1; i < points.length; i++) {
+                    const [a, A] = points[i - 1], [b, B] = points[i];
+                    if (v <= b) { out = A + (v - a) * (B - A) / (b - a); break; }
+                }
+                values.push((out / 255).toFixed(4));
+            }
+            const table = values.join(' ');
+            document.querySelectorAll('#soften-map feComponentTransfer > *')
+                .forEach(fn => fn.setAttribute('tableValues', table));
+        }
+        softenMapTable();
 
         let tileLayer = L.tileLayer(cartoTiles('light_all'), {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
